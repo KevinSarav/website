@@ -1,0 +1,15 @@
+services:
+  website:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${COMPOSE_IMAGE_NAME:-local/professional-showcase}:${COMPOSE_IMAGE_TAG:-latest}
+    container_name: ${COMPOSE_CONTAINER_NAME:-professional-showcase}
+    restart: unless-stopped
+    ports:
+      - "${COMPOSE_PORT:-4173}:80"
+    environment:
+      - VITE_SITE_OWNER=${VITE_SITE_OWNER:-Your Name}
+      - VITE_CONTACT_EMAIL=${VITE_CONTACT_EMAIL:-contact_placeholder}
+      - VITE_LOCATION=${VITE_LOCATION:-Your Location}
+      - VITE_ANALYTICS_HOST=${VITE_ANALYTICS_HOST:-}
