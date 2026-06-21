@@ -1,6 +1,5 @@
 import js from '@eslint/js';
 import globals from 'globals';
-import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';
@@ -27,7 +26,6 @@ export default [
       },
     },
     plugins: {
-      react: reactPlugin,
       'react-hooks': reactHooksPlugin,
       '@typescript-eslint': typescriptEslintPlugin,
     },
@@ -43,11 +41,6 @@ export default [
           varsIgnorePattern: '^_',
         },
       ],
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
     },
   },
   {
