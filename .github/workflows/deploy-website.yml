@@ -140,18 +140,50 @@ jobs:
           set -euo pipefail
           ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' DOCX_CONVERTER_IMAGE='$DOCX_CONVERTER_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' bash '$DEPLOY_PATH/scripts/deploy-remote.sh'"
 
-      - name: Cleanup old website image versions (keep 3)
-        continue-on-error: true
-        uses: actions/delete-package-versions@v5
-        with:
-          package-name: website
-          package-type: container
-          min-versions-to-keep: 3
+      - name: Cleanup old GHCR versions (keep 3)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
 
-      - name: Cleanup old converter image versions (keep 3)
-        continue-on-error: true
-        uses: actions/delete-package-versions@v5
-        with:
-          package-name: docx-converter
-          package-type: container
-          min-versions-to-keep: 3
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          keep=3
+          packages=("website" "docx-converter")
+
+          list_versions() {
+            local pkg="$1"
+            gh api "users/$owner/packages/container/$pkg/versions?per_page=100" 2>/dev/null || \
+              gh api "orgs/$owner/packages/container/$pkg/versions?per_page=100" 2>/dev/null || true
+          }
+
+          delete_version() {
+            local pkg="$1"
+            local id="$2"
+            gh api -X DELETE "users/$owner/packages/container/$pkg/versions/$id" 2>/dev/null || \
+              gh api -X DELETE "orgs/$owner/packages/container/$pkg/versions/$id" 2>/dev/null || true
+          }
+
+          for pkg in "${packages[@]}"; do
+            echo "Cleaning package: $pkg"
+            versions_json="$(list_versions "$pkg")"
+
+            if [[ -z "$versions_json" ]] || [[ "$versions_json" == "[]" ]]; then
+              echo "No versions found or package does not exist yet: $pkg"
+              continue
+            fi
+
+            mapfile -t stale_ids < <(printf '%s' "$versions_json" | jq -r --argjson keep "$keep" '
+              sort_by(.created_at) | reverse | .[$keep:] | .[].id
+            ')
+
+            if (( ${#stale_ids[@]} == 0 )); then
+              echo "Nothing to delete for $pkg"
+              continue
+            fi
+
+            for id in "${stale_ids[@]}"; do
+              echo "Deleting $pkg version id=$id"
+              delete_version "$pkg" "$id"
+            done
+          done
