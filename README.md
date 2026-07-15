@@ -59,3 +59,18 @@ Optional (only needed if cleanup cannot delete versions with `GITHUB_TOKEN`):
 ### Cleanup policy
 
 Cleanup runs as part of deploy workflow `.github/workflows/deploy-website.yml`. After a successful deploy, GitHub keeps only the newest 3 versions for each container package (`website` and `docx-converter`) and deletes older versions.
+
+## Encrypt `.env` to `.env.sops` (Manual)
+
+Use SOPS locally whenever `.env` changes:
+
+```bash
+sops --encrypt --input-type dotenv --output-type dotenv .env > .env.sops
+chmod 600 .env.sops
+```
+
+If you rotate or add Age keys, update recipients in `.sops.yaml` under `creation_rules[].age`, then re-encrypt:
+
+```bash
+sops updatekeys .env.sops
+```
