@@ -1,0 +1,180 @@
+name: Deploy Website
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-publish:
+    name: Build and publish images
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      VITE_MY_NAME: ${{ vars.VITE_MY_NAME }}
+      VITE_ROLE: ${{ vars.VITE_ROLE }}
+      VITE_SUMMARY: ${{ vars.VITE_SUMMARY }}
+      VITE_LOCATION: ${{ vars.VITE_LOCATION }}
+      VITE_AVAILABILITY: ${{ vars.VITE_AVAILABILITY }}
+      VITE_PUBLIC_URL: ${{ vars.VITE_PUBLIC_URL }}
+      VITE_RESUME_EMBED_URL: ${{ vars.VITE_RESUME_EMBED_URL }}
+      VITE_RESUME_DOWNLOAD_URL: ${{ vars.VITE_RESUME_DOWNLOAD_URL }}
+    outputs:
+      image_owner: ${{ steps.images.outputs.image_owner }}
+      website_image: ${{ steps.images.outputs.website_image }}
+      converter_image: ${{ steps.images.outputs.converter_image }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate website build variables
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=()
+          for key in VITE_MY_NAME VITE_ROLE VITE_SUMMARY VITE_LOCATION VITE_AVAILABILITY VITE_PUBLIC_URL VITE_RESUME_EMBED_URL VITE_RESUME_DOWNLOAD_URL; do
+            if [[ -z "${!key:-}" ]]; then
+              missing+=("$key")
+            fi
+          done
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error title=Missing required repository variables::Set these variables in repository settings or Environment 'production': ${missing[*]}"
+            exit 1
+          fi
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set image names
+        id: images
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          echo "image_owner=$owner" >> "$GITHUB_OUTPUT"
+          echo "website_image=ghcr.io/$owner/website:latest" >> "$GITHUB_OUTPUT"
+          echo "converter_image=ghcr.io/$owner/docx-converter:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push website image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ steps.images.outputs.website_image }}
+            ghcr.io/${{ steps.images.outputs.image_owner }}/website:${{ github.sha }}
+          build-args: |
+            VITE_MY_NAME=${{ env.VITE_MY_NAME }}
+            VITE_ROLE=${{ env.VITE_ROLE }}
+            VITE_SUMMARY=${{ env.VITE_SUMMARY }}
+            VITE_LOCATION=${{ env.VITE_LOCATION }}
+            VITE_AVAILABILITY=${{ env.VITE_AVAILABILITY }}
+            VITE_PUBLIC_URL=${{ env.VITE_PUBLIC_URL }}
+            VITE_RESUME_EMBED_URL=${{ env.VITE_RESUME_EMBED_URL }}
+            VITE_RESUME_DOWNLOAD_URL=${{ env.VITE_RESUME_DOWNLOAD_URL }}
+
+      - name: Build and push converter image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./converter/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.images.outputs.converter_image }}
+            ghcr.io/${{ steps.images.outputs.image_owner }}/docx-converter:${{ github.sha }}
+
+  deploy:
+    name: Deploy to server
+    needs:
+      - build-and-publish
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+      GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      WEBSITE_IMAGE: ${{ needs.build-and-publish.outputs.website_image }}
+      DOCX_CONVERTER_IMAGE: ${{ needs.build-and-publish.outputs.converter_image }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate deployment secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=()
+          for key in DEPLOY_USER DEPLOY_HOST DEPLOY_PATH DEPLOY_SSH_PRIVATE_KEY; do
+            if [[ -z "${!key:-}" ]]; then
+              missing+=("$key")
+            fi
+          done
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error title=Missing required deployment secrets::Set these secrets in repository secrets or Environment 'production': ${missing[*]}"
+            exit 1
+          fi
+
+          if [[ -z "${DEPLOY_PORT:-}" ]]; then
+            echo "DEPLOY_PORT=22" >> "$GITHUB_ENV"
+          else
+            echo "DEPLOY_PORT=$DEPLOY_PORT" >> "$GITHUB_ENV"
+          fi
+
+          if [[ -n "${GHCR_USERNAME:-}" && -z "${GHCR_TOKEN:-}" ]]; then
+            echo "::error title=Missing GHCR_TOKEN::GHCR_USERNAME is set but GHCR_TOKEN is empty."
+            exit 1
+          fi
+
+          if [[ -z "${GHCR_USERNAME:-}" && -n "${GHCR_TOKEN:-}" ]]; then
+            echo "::error title=Missing GHCR_USERNAME::GHCR_TOKEN is set but GHCR_USERNAME is empty."
+            exit 1
+          fi
+
+      - name: Setup SSH key
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Pull latest main and deploy on server
+        shell: bash
+        env:
+          DEPLOY_BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' DOCX_CONVERTER_IMAGE='$DOCX_CONVERTER_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' bash '$DEPLOY_PATH/scripts/deploy-remote.sh'"
+
+      - name: Cleanup old website image versions (keep 3)
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: website
+          package-type: container
+          min-versions-to-keep: 3
+
+      - name: Cleanup old converter image versions (keep 3)
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: docx-converter
+          package-type: container
+          min-versions-to-keep: 3

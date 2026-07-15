@@ -1,0 +1,302 @@
+:root {
+  color-scheme: light;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(244, 168, 89, 0.18), transparent 26%),
+    radial-gradient(circle at right, rgba(57, 85, 217, 0.12), transparent 24%),
+    linear-gradient(160deg, #f5efe4 0%, #ebf1f8 45%, #f8fafc 100%);
+  color: #17202a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.page-shell {
+  min-height: 100vh;
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.hero-panel,
+.content-grid,
+.resume-panel {
+  border: 1px solid rgba(23, 32, 42, 0.08);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 24px 80px rgba(23, 32, 42, 0.12);
+  backdrop-filter: blur(14px);
+}
+
+.hero-panel {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr;
+  gap: 1.5rem;
+  padding: clamp(2rem, 4vw, 4rem);
+}
+
+.hero-copy {
+  display: grid;
+  align-content: start;
+}
+
+.hero-aside {
+  display: grid;
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8b4b19;
+}
+
+h1,
+h2 {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(3.2rem, 9vw, 6rem);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.lede {
+  margin: 1.5rem 0 0;
+  max-width: 42rem;
+  font-size: 1.12rem;
+  line-height: 1.8;
+  color: #40505e;
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.meta-row span {
+  padding: 0.8rem 1rem;
+  border-radius: 999px;
+  background: rgba(23, 32, 42, 0.05);
+  color: #223244;
+  font-size: 0.95rem;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+}
+
+.info-card {
+  padding: 1.4rem;
+  border-radius: 24px;
+  background: rgba(252, 252, 252, 0.92);
+  min-height: 100%;
+}
+
+.accent-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.84)),
+    linear-gradient(145deg, rgba(244, 168, 89, 0.25), rgba(57, 85, 217, 0.12));
+}
+
+.card-label {
+  margin: 0 0 1rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6e7d8d;
+}
+
+.stack-list,
+.highlight-list,
+.note-list {
+  margin: 0;
+  padding: 0;
+}
+
+.stack-list {
+  list-style: none;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.stack-list li {
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  background: rgba(23, 32, 42, 0.05);
+  color: #223244;
+}
+
+.highlight-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.highlight-item {
+  padding: 1rem 0;
+  border-top: 1px solid rgba(23, 32, 42, 0.08);
+}
+
+.highlight-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.highlight-item h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.45rem;
+}
+
+.highlight-item p,
+.note-list p,
+.resume-placeholder p,
+.resume-help {
+  margin: 0;
+  line-height: 1.75;
+  color: #40505e;
+}
+
+.note-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.resume-panel {
+  margin-top: 1.25rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.resume-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.resume-header h2 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.05;
+}
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.85rem 1.15rem;
+  border-radius: 999px;
+  background: #17202a;
+  color: #f7f8fa;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.primary-button:hover {
+  background: #243345;
+}
+
+.resume-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.85rem 1.15rem;
+  border-radius: 999px;
+  background: transparent;
+  color: #17202a;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid rgba(23, 32, 42, 0.2);
+  cursor: pointer;
+  font: inherit;
+}
+
+.secondary-button:hover {
+  background: rgba(23, 32, 42, 0.06);
+}
+
+.resume-frame,
+.resume-placeholder {
+  width: 100%;
+  min-height: 70vh;
+  border: 1px solid rgba(23, 32, 42, 0.08);
+  border-radius: 22px;
+  background: rgba(244, 246, 249, 0.9);
+}
+
+.resume-frame {
+  display: block;
+}
+
+.resume-help {
+  margin-top: 0.9rem;
+  font-size: 0.95rem;
+}
+
+.resume-placeholder {
+  display: grid;
+  align-content: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+strong {
+  color: #17202a;
+}
+
+@media (max-width: 900px) {
+  .hero-panel,
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resume-header {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    width: min(100% - 1rem, 1180px);
+    padding: 1rem 0 2rem;
+  }
+
+  .hero-panel,
+  .content-grid,
+  .resume-panel {
+    border-radius: 22px;
+  }
+
+  .info-card,
+  .resume-frame,
+  .resume-placeholder {
+    border-radius: 18px;
+  }
+}
