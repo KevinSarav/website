@@ -1,6 +1,6 @@
-# Professional Website
+# Website Showcase
 
-Professional showcase website.
+Showcase website.
 
 ## Local Development
 
