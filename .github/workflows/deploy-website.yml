@@ -15,6 +15,9 @@ jobs:
     name: Build and publish images
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      contents: read
+      packages: write
     outputs:
       image_owner: ${{ steps.images.outputs.image_owner }}
       website_image: ${{ steps.images.outputs.website_image }}
@@ -28,8 +31,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.GHCR_PUSH_USERNAME || github.repository_owner }}
+          password: ${{ secrets.GHCR_PUSH_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Set image names
         id: images
