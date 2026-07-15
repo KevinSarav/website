@@ -15,15 +15,6 @@ jobs:
     name: Build and publish images
     runs-on: ubuntu-latest
     environment: production
-    env:
-      VITE_MY_NAME: ${{ vars.VITE_MY_NAME }}
-      VITE_ROLE: ${{ vars.VITE_ROLE }}
-      VITE_SUMMARY: ${{ vars.VITE_SUMMARY }}
-      VITE_LOCATION: ${{ vars.VITE_LOCATION }}
-      VITE_AVAILABILITY: ${{ vars.VITE_AVAILABILITY }}
-      VITE_PUBLIC_URL: ${{ vars.VITE_PUBLIC_URL }}
-      VITE_RESUME_EMBED_URL: ${{ vars.VITE_RESUME_EMBED_URL }}
-      VITE_RESUME_DOWNLOAD_URL: ${{ vars.VITE_RESUME_DOWNLOAD_URL }}
     outputs:
       image_owner: ${{ steps.images.outputs.image_owner }}
       website_image: ${{ steps.images.outputs.website_image }}
@@ -32,22 +23,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Validate website build variables
-        shell: bash
-        run: |
-          set -euo pipefail
-          missing=()
-          for key in VITE_MY_NAME VITE_ROLE VITE_SUMMARY VITE_LOCATION VITE_AVAILABILITY VITE_PUBLIC_URL VITE_RESUME_EMBED_URL VITE_RESUME_DOWNLOAD_URL; do
-            if [[ -z "${!key:-}" ]]; then
-              missing+=("$key")
-            fi
-          done
-
-          if (( ${#missing[@]} > 0 )); then
-            echo "::error title=Missing required repository variables::Set these variables in repository settings or Environment 'production': ${missing[*]}"
-            exit 1
-          fi
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -75,15 +50,6 @@ jobs:
           tags: |
             ${{ steps.images.outputs.website_image }}
             ghcr.io/${{ steps.images.outputs.image_owner }}/website:${{ github.sha }}
-          build-args: |
-            VITE_MY_NAME=${{ env.VITE_MY_NAME }}
-            VITE_ROLE=${{ env.VITE_ROLE }}
-            VITE_SUMMARY=${{ env.VITE_SUMMARY }}
-            VITE_LOCATION=${{ env.VITE_LOCATION }}
-            VITE_AVAILABILITY=${{ env.VITE_AVAILABILITY }}
-            VITE_PUBLIC_URL=${{ env.VITE_PUBLIC_URL }}
-            VITE_RESUME_EMBED_URL=${{ env.VITE_RESUME_EMBED_URL }}
-            VITE_RESUME_DOWNLOAD_URL=${{ env.VITE_RESUME_DOWNLOAD_URL }}
 
       - name: Build and push converter image
         uses: docker/build-push-action@v6

@@ -62,6 +62,8 @@ async function handleResumeDownloadClick() {
   }
 }
 
+document.title = siteContent.appName
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <main className="page-shell">

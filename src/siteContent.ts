@@ -1,16 +1,19 @@
+import { runtimeConfig } from './runtimeConfig'
+
 export const siteContent = {
-  name: import.meta.env.VITE_MY_NAME?.trim() ?? 'REPLACE_ME',
-  role: import.meta.env.VITE_ROLE?.trim() ?? 'REPLACE_ME',
-  summary: import.meta.env.VITE_SUMMARY?.trim() ?? 'REPLACE_ME',
-  location: import.meta.env.VITE_LOCATION?.trim() ?? 'REPLACE_ME',
-  availability: import.meta.env.VITE_AVAILABILITY?.trim() ?? 'REPLACE_ME',
+  appName: runtimeConfig.appName,
+  name: runtimeConfig.myName,
+  role: runtimeConfig.role,
+  summary: runtimeConfig.summary,
+  location: runtimeConfig.location,
+  availability: runtimeConfig.availability,
   notes: [
-    'REPLACE_ME',
-    'REPLACE_ME',
+    runtimeConfig.note1,
+    runtimeConfig.note2,
   ],
   resume: {
-    embedUrl: import.meta.env.VITE_RESUME_EMBED_URL?.trim() ?? '',
-    downloadUrl: import.meta.env.VITE_RESUME_DOWNLOAD_URL?.trim() ?? '',
+    embedUrl: runtimeConfig.resumeEmbedUrl,
+    downloadUrl: runtimeConfig.resumeDownloadUrl,
   },
 } as const
 

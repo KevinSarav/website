@@ -1,21 +1,5 @@
 FROM node:22-alpine AS build
 WORKDIR /app
-ARG VITE_MY_NAME=""
-ARG VITE_ROLE=""
-ARG VITE_SUMMARY=""
-ARG VITE_LOCATION=""
-ARG VITE_AVAILABILITY=""
-ARG VITE_PUBLIC_URL=""
-ARG VITE_RESUME_EMBED_URL=""
-ARG VITE_RESUME_DOWNLOAD_URL=""
-ENV VITE_MY_NAME="$VITE_MY_NAME"
-ENV VITE_ROLE="$VITE_ROLE"
-ENV VITE_SUMMARY="$VITE_SUMMARY"
-ENV VITE_LOCATION="$VITE_LOCATION"
-ENV VITE_AVAILABILITY="$VITE_AVAILABILITY"
-ENV VITE_PUBLIC_URL="$VITE_PUBLIC_URL"
-ENV VITE_RESUME_EMBED_URL="$VITE_RESUME_EMBED_URL"
-ENV VITE_RESUME_DOWNLOAD_URL="$VITE_RESUME_DOWNLOAD_URL"
 COPY package.json package-lock.json* ./
 RUN npm install
 COPY . .
@@ -24,4 +8,6 @@ RUN npm run build
 FROM nginx:1.29-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
+COPY docker/generate-runtime-config.sh /docker-entrypoint.d/generate-runtime-config.sh
+RUN chmod +x /docker-entrypoint.d/generate-runtime-config.sh
 EXPOSE 80

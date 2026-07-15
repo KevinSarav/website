@@ -3,15 +3,18 @@ services:
     image: ${WEBSITE_IMAGE}
     build:
       context: .
-      args:
-        VITE_MY_NAME: ${VITE_MY_NAME}
-        VITE_ROLE: ${VITE_ROLE}
-        VITE_SUMMARY: ${VITE_SUMMARY}
-        VITE_LOCATION: ${VITE_LOCATION}
-        VITE_AVAILABILITY: ${VITE_AVAILABILITY}
-        VITE_PUBLIC_URL: ${VITE_PUBLIC_URL}
-        VITE_RESUME_EMBED_URL: ${VITE_RESUME_EMBED_URL}
-        VITE_RESUME_DOWNLOAD_URL: ${VITE_RESUME_DOWNLOAD_URL}
+    environment:
+      SITE_APP_NAME: ${SITE_APP_NAME}
+      SITE_MY_NAME: ${SITE_MY_NAME}
+      SITE_ROLE: ${SITE_ROLE}
+      SITE_SUMMARY: ${SITE_SUMMARY}
+      SITE_LOCATION: ${SITE_LOCATION}
+      SITE_AVAILABILITY: ${SITE_AVAILABILITY}
+      SITE_PUBLIC_URL: ${SITE_PUBLIC_URL}
+      SITE_RESUME_EMBED_URL: ${SITE_RESUME_EMBED_URL}
+      SITE_RESUME_DOWNLOAD_URL: ${SITE_RESUME_DOWNLOAD_URL}
+      SITE_NOTE_1: ${SITE_NOTE_1}
+      SITE_NOTE_2: ${SITE_NOTE_2}
     container_name: website
     ports:
       - "127.0.0.1:5180:80"
@@ -26,8 +29,8 @@ services:
       dockerfile: converter/Dockerfile
     container_name: docx-converter
     environment:
-      RESUME_SOURCE_URL: ${VITE_RESUME_DOWNLOAD_URL}
-      RESUME_EMBED_URL: ${VITE_RESUME_EMBED_URL}
+      RESUME_SOURCE_URL: ${SITE_RESUME_DOWNLOAD_URL}
+      RESUME_EMBED_URL: ${SITE_RESUME_EMBED_URL}
       GOTENBERG_URL: http://gotenberg:3000
       PDF_FILENAME: ${PDF_FILENAME}
       DOCX_FETCH_TIMEOUT_MS: 20000

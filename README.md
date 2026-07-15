@@ -25,8 +25,10 @@ The stack also starts two internal services for dynamic resume PDF generation:
 - `gotenberg` for DOCX to PDF conversion.
 - `docx-converter` for serving `/api/resume.pdf`.
 
-`VITE_RESUME_DOWNLOAD_URL` is used as the source DOCX URL for both the `Open resume` button and server-side PDF conversion.
+`SITE_RESUME_DOWNLOAD_URL` is used as the source DOCX URL for both the `Open resume` button and server-side PDF conversion.
 Set `PDF_FILENAME` in `.env`/`.env.sops` to control the downloaded PDF file name.
+
+Frontend content values are runtime env (`SITE_*`) now. You can change them in `.env/.env.sops` and redeploy without rebuilding images.
 
 ## GitHub Packages (Private GHCR)
 
@@ -39,16 +41,6 @@ Deployment then pulls those images on the server instead of building them there.
 `WEBSITE_IMAGE` and `DOCX_CONVERTER_IMAGE` are injected by GitHub Actions during deploy (from workflow outputs), not from server `.env`.
 
 ### Required GitHub configuration
-
-Set repository or environment (`production`) Variables for frontend build args:
-- `VITE_MY_NAME`
-- `VITE_ROLE`
-- `VITE_SUMMARY`
-- `VITE_LOCATION`
-- `VITE_AVAILABILITY`
-- `VITE_PUBLIC_URL`
-- `VITE_RESUME_EMBED_URL`
-- `VITE_RESUME_DOWNLOAD_URL`
 
 Set deployment Secrets:
 - `DEPLOY_USER`
