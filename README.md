@@ -53,6 +53,9 @@ Optional (needed for private image pull auth from server):
 - `GHCR_USERNAME`
 - `GHCR_TOKEN` (PAT with `read:packages`)
 
+Optional (only needed if cleanup cannot delete versions with `GITHUB_TOKEN`):
+- `GHCR_CLEANUP_TOKEN` (classic PAT with `delete:packages`)
+
 ### Cleanup policy
 
 Cleanup runs as part of deploy workflow `.github/workflows/deploy-website.yml`. After a successful deploy, GitHub keeps only the newest 3 versions for each container package (`website` and `docx-converter`) and deletes older versions.

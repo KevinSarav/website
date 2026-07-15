@@ -43,11 +43,27 @@ if [[ -n "${GHCR_USERNAME:-}" || -n "${GHCR_TOKEN:-}" ]]; then
     exit 1
   fi
 
+  docker_cfg_dir="$(mktemp -d)"
+  cleanup_docker_cfg() {
+    if [[ -n "${docker_cfg_dir:-}" && -d "$docker_cfg_dir" ]]; then
+      DOCKER_CONFIG="$docker_cfg_dir" docker logout ghcr.io >/dev/null 2>&1 || true
+      rm -rf "$docker_cfg_dir"
+    fi
+  }
+  trap cleanup_docker_cfg EXIT
+
   echo "Authenticating Docker with ghcr.io"
-  printf '%s\n' "$GHCR_TOKEN" | docker login ghcr.io --username "$GHCR_USERNAME" --password-stdin
+  printf '%s\n' "$GHCR_TOKEN" | DOCKER_CONFIG="$docker_cfg_dir" docker login ghcr.io --username "$GHCR_USERNAME" --password-stdin
 fi
 
-docker compose pull website docx-converter gotenberg
+if [[ -n "${docker_cfg_dir:-}" ]]; then
+  DOCKER_CONFIG="$docker_cfg_dir" docker compose pull website docx-converter gotenberg
+  cleanup_docker_cfg
+  trap - EXIT
+else
+  docker compose pull website docx-converter gotenberg
+fi
+
 docker compose up -d --force-recreate --remove-orphans
 
 docker image prune -f >/dev/null 2>&1 || true
