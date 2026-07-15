@@ -53,6 +53,9 @@ jobs:
           tags: |
             ${{ steps.images.outputs.website_image }}
             ghcr.io/${{ steps.images.outputs.image_owner }}/website:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.description=Website frontend image
 
       - name: Build and push converter image
         uses: docker/build-push-action@v6
@@ -63,6 +66,9 @@ jobs:
           tags: |
             ${{ steps.images.outputs.converter_image }}
             ghcr.io/${{ steps.images.outputs.image_owner }}/docx-converter:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.description=DOCX to PDF converter image
 
   deploy:
     name: Deploy to server
@@ -135,6 +141,7 @@ jobs:
           ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' DOCX_CONVERTER_IMAGE='$DOCX_CONVERTER_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' bash '$DEPLOY_PATH/scripts/deploy-remote.sh'"
 
       - name: Cleanup old website image versions (keep 3)
+        continue-on-error: true
         uses: actions/delete-package-versions@v5
         with:
           package-name: website
@@ -142,6 +149,7 @@ jobs:
           min-versions-to-keep: 3
 
       - name: Cleanup old converter image versions (keep 3)
+        continue-on-error: true
         uses: actions/delete-package-versions@v5
         with:
           package-name: docx-converter
