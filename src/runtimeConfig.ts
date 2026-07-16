@@ -31,14 +31,14 @@ function getString(value: unknown, fallback = '') {
 
 export const runtimeConfig: RuntimeConfig = {
   appName: getString(window.__APP_CONFIG__?.appName, 'Website'),
-  myName: getString(window.__APP_CONFIG__?.myName, 'REPLACE_ME'),
-  role: getString(window.__APP_CONFIG__?.role, 'REPLACE_ME'),
-  summary: getString(window.__APP_CONFIG__?.summary, 'REPLACE_ME'),
-  location: getString(window.__APP_CONFIG__?.location, 'REPLACE_ME'),
-  availability: getString(window.__APP_CONFIG__?.availability, 'REPLACE_ME'),
+  myName: getString(window.__APP_CONFIG__?.myName, 'Your Name'),
+  role: getString(window.__APP_CONFIG__?.role, 'Professional'),
+  summary: getString(window.__APP_CONFIG__?.summary),
+  location: getString(window.__APP_CONFIG__?.location),
+  availability: getString(window.__APP_CONFIG__?.availability),
   publicUrl: getString(window.__APP_CONFIG__?.publicUrl),
   resumeEmbedUrl: getString(window.__APP_CONFIG__?.resumeEmbedUrl),
   resumeDownloadUrl: getString(window.__APP_CONFIG__?.resumeDownloadUrl),
-  note1: getString(window.__APP_CONFIG__?.note1, 'REPLACE_ME'),
-  note2: getString(window.__APP_CONFIG__?.note2, 'REPLACE_ME'),
+  note1: getString(window.__APP_CONFIG__?.note1),
+  note2: getString(window.__APP_CONFIG__?.note2),
 }
