@@ -11,7 +11,6 @@ role="${PROFILE_ROLE:-REPLACE_ME}"
 profile_city="${PROFILE_CITY:-}"
 profile_region="${PROFILE_REGION:-}"
 profile_country="${PROFILE_COUNTRY:-}"
-availability="${PROFILE_AVAILABILITY:-REPLACE_ME}"
 public_url="${SITE_PUBLIC_URL:-}"
 gdoc_resume_id="${SITE_GDOC_RESUME_ID:-}"
 gdoc_summary_id="${SITE_GDOC_SUMMARY_ID:-}"
@@ -66,7 +65,6 @@ window.__APP_CONFIG__ = {
   myName: "$(escape_js "$my_name")",
   role: "$(escape_js "$role")",
   location: "$(escape_js "$location")",
-  availability: "$(escape_js "$availability")",
   publicUrl: "$(escape_js "$public_url")",
   gdocSummaryId: "$(escape_js "$gdoc_summary_id")",
   gdocHighlightsId: "$(escape_js "$gdoc_highlights_id")",

@@ -5,10 +5,6 @@ import './styles.css'
 
 document.title = siteContent.appName
 
-const metaItems = [siteContent.location, siteContent.availability].filter(
-  (value) => value.length > 0,
-)
-
 function buildGoogleDocTextUrl(docId: string) {
   return `https://docs.google.com/document/d/${docId}/export?format=txt`
 }
@@ -21,12 +17,17 @@ async function fetchDocText(docId: string) {
   return response.text()
 }
 
-function parseSummary(text: string) {
-  return text
+function parseSummaryDoc(text: string) {
+  const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .join(' ')
+
+  const [availability = '', ...summaryLines] = lines
+  return {
+    availability,
+    summary: summaryLines.join(' '),
+  }
 }
 
 function parseHighlights(text: string) {
@@ -38,7 +39,9 @@ function parseHighlights(text: string) {
 
 function App() {
   const [summary, setSummary] = useState(siteContent.summary)
+  const [availability, setAvailability] = useState('')
   const [highlights, setHighlights] = useState<string[]>([...siteContent.highlights])
+  const metaItems = [siteContent.location, availability].filter((value) => value.length > 0)
 
   useEffect(() => {
     let cancelled = false
@@ -47,9 +50,12 @@ function App() {
       if (siteContent.summaryDocId.length > 0) {
         try {
           const summaryText = await fetchDocText(siteContent.summaryDocId)
-          const parsedSummary = parseSummary(summaryText)
-          if (!cancelled && parsedSummary.length > 0) {
-            setSummary(parsedSummary)
+          const parsedSummaryDoc = parseSummaryDoc(summaryText)
+          if (!cancelled && parsedSummaryDoc.availability.length > 0) {
+            setAvailability(parsedSummaryDoc.availability)
+          }
+          if (!cancelled && parsedSummaryDoc.summary.length > 0) {
+            setSummary(parsedSummaryDoc.summary)
           }
         } catch {
           // Keep local fallback content when Google Doc fetch fails.

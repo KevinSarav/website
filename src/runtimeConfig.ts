@@ -3,7 +3,6 @@ export type RuntimeConfig = {
   myName: string
   role: string
   location: string
-  availability: string
   publicUrl: string
   gdocSummaryId: string
   gdocHighlightsId: string
@@ -35,7 +34,6 @@ export const runtimeConfig: RuntimeConfig = {
   myName: getString(window.__APP_CONFIG__?.myName, 'Your Name'),
   role: getString(window.__APP_CONFIG__?.role, 'Professional'),
   location: getString(window.__APP_CONFIG__?.location),
-  availability: getString(window.__APP_CONFIG__?.availability),
   publicUrl: getString(window.__APP_CONFIG__?.publicUrl),
   gdocSummaryId: getString(window.__APP_CONFIG__?.gdocSummaryId),
   gdocHighlightsId: getString(window.__APP_CONFIG__?.gdocHighlightsId),

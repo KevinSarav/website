@@ -36,8 +36,6 @@ const config = {
   PROFILE_CITY: process.env.PROFILE_CITY || env.PROFILE_CITY || '',
   PROFILE_REGION: process.env.PROFILE_REGION || env.PROFILE_REGION || '',
   PROFILE_COUNTRY: process.env.PROFILE_COUNTRY || env.PROFILE_COUNTRY || '',
-  PROFILE_AVAILABILITY:
-    process.env.PROFILE_AVAILABILITY || env.PROFILE_AVAILABILITY || 'REPLACE_ME',
   SITE_PUBLIC_URL: process.env.SITE_PUBLIC_URL || env.SITE_PUBLIC_URL || '',
   SITE_GDOC_RESUME_ID: process.env.SITE_GDOC_RESUME_ID || env.SITE_GDOC_RESUME_ID || '',
   SITE_GDOC_SUMMARY_ID: process.env.SITE_GDOC_SUMMARY_ID || env.SITE_GDOC_SUMMARY_ID || '',
@@ -64,7 +62,6 @@ const configJs = `window.__APP_CONFIG__ = {
   myName: '${escapeJs(config.PROFILE_MY_NAME)}',
   role: '${escapeJs(config.PROFILE_ROLE)}',
   location: '${escapeJs(resolvedLocation)}',
-  availability: '${escapeJs(config.PROFILE_AVAILABILITY)}',
   publicUrl: '${escapeJs(config.SITE_PUBLIC_URL)}',
   gdocSummaryId: '${escapeJs(config.SITE_GDOC_SUMMARY_ID)}',
   gdocHighlightsId: '${escapeJs(config.SITE_GDOC_HIGHLIGHTS_ID)}',

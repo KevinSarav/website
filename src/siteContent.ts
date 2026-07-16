@@ -8,7 +8,6 @@ export const siteContent = {
   summary: profileContent.summary,
   summaryDocId: runtimeConfig.gdocSummaryId,
   location: runtimeConfig.location,
-  availability: runtimeConfig.availability,
   highlights: profileContent.highlights,
   highlightsDocId: runtimeConfig.gdocHighlightsId,
   resume: {
