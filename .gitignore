@@ -6,3 +6,4 @@ dist/
 !.env.sops
 !.env.*.sops
 .githooks/
+public/runtime-config.js

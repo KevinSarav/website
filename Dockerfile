@@ -4,6 +4,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
 COPY . .
+RUN node scripts/generate-runtime-config.js
 RUN SITE_PUBLIC_URL=${SITE_PUBLIC_URL} npm run build
 
 FROM nginx:1.29-alpine
