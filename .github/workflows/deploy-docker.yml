@@ -154,12 +154,36 @@ jobs:
           DEPLOY_BRANCH: ${{ github.ref_name }}
         run: |
           set -euo pipefail
+
+          read_env_value() {
+            local key="$1"
+            if [[ ! -f .env ]]; then
+              return 0
+            fi
+            grep -E "^${key}=" .env | head -n 1 | cut -d '=' -f2- || true
+          }
+
           resume_id="${SITE_GDOC_RESUME_ID_VAR:-}"
           if [[ -z "$resume_id" && -n "${SITE_GDOC_RESUME_ID_SECRET:-}" ]]; then
             resume_id="$SITE_GDOC_RESUME_ID_SECRET"
           fi
 
-          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' SITE_GDOC_RESUME_ID='$resume_id' SITE_RESUME_OPEN_URL='${SITE_RESUME_OPEN_URL_VAR:-}' SITE_RESUME_EMBED_URL='${SITE_RESUME_EMBED_URL_VAR:-}' SITE_RESUME_DOWNLOAD_URL='${SITE_RESUME_DOWNLOAD_URL_VAR:-}' bash '$DEPLOY_PATH/scripts/deploy-remote.sh'"
+          resume_open_url="${SITE_RESUME_OPEN_URL_VAR:-}"
+          if [[ -z "$resume_open_url" ]]; then
+            resume_open_url="$(read_env_value SITE_RESUME_OPEN_URL)"
+          fi
+
+          resume_embed_url="${SITE_RESUME_EMBED_URL_VAR:-}"
+          if [[ -z "$resume_embed_url" ]]; then
+            resume_embed_url="$(read_env_value SITE_RESUME_EMBED_URL)"
+          fi
+
+          resume_download_url="${SITE_RESUME_DOWNLOAD_URL_VAR:-}"
+          if [[ -z "$resume_download_url" ]]; then
+            resume_download_url="$(read_env_value SITE_RESUME_DOWNLOAD_URL)"
+          fi
+
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' SITE_GDOC_RESUME_ID='$resume_id' SITE_RESUME_OPEN_URL='$resume_open_url' SITE_RESUME_EMBED_URL='$resume_embed_url' SITE_RESUME_DOWNLOAD_URL='$resume_download_url' bash '$DEPLOY_PATH/scripts/deploy-remote.sh'"
 
       - name: Cleanup old GHCR versions (keep 3)
         shell: bash
