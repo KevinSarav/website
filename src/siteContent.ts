@@ -6,9 +6,11 @@ export const siteContent = {
   name: runtimeConfig.myName,
   role: runtimeConfig.role,
   summary: profileContent.summary,
+  summaryDocId: runtimeConfig.gdocSummaryId,
   location: runtimeConfig.location,
   availability: runtimeConfig.availability,
   highlights: profileContent.highlights,
+  highlightsDocId: runtimeConfig.gdocHighlightsId,
   resume: {
     openUrl:
       runtimeConfig.resumeOpenUrl || runtimeConfig.resumeEmbedUrl || runtimeConfig.resumeDownloadUrl,

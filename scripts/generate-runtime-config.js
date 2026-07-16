@@ -39,6 +39,8 @@ const config = {
   SITE_AVAILABILITY: process.env.SITE_AVAILABILITY || env.SITE_AVAILABILITY || 'REPLACE_ME',
   SITE_PUBLIC_URL: process.env.SITE_PUBLIC_URL || env.SITE_PUBLIC_URL || '',
   SITE_GDOC_RESUME_ID: process.env.SITE_GDOC_RESUME_ID || env.SITE_GDOC_RESUME_ID || '',
+  SITE_GDOC_SUMMARY_ID: process.env.SITE_GDOC_SUMMARY_ID || env.SITE_GDOC_SUMMARY_ID || '',
+  SITE_GDOC_HIGHLIGHTS_ID: process.env.SITE_GDOC_HIGHLIGHTS_ID || env.SITE_GDOC_HIGHLIGHTS_ID || '',
   RESUME_PDF_FILE_NAME:
     process.env.RESUME_PDF_FILE_NAME || env.RESUME_PDF_FILE_NAME || 'Kevin_Saravia_Resume.pdf',
 }
@@ -63,6 +65,8 @@ const configJs = `window.__APP_CONFIG__ = {
   location: '${escapeJs(resolvedLocation)}',
   availability: '${escapeJs(config.SITE_AVAILABILITY)}',
   publicUrl: '${escapeJs(config.SITE_PUBLIC_URL)}',
+  gdocSummaryId: '${escapeJs(config.SITE_GDOC_SUMMARY_ID)}',
+  gdocHighlightsId: '${escapeJs(config.SITE_GDOC_HIGHLIGHTS_ID)}',
   resumeOpenUrl: '${escapeJs(resumeOpenUrl)}',
   resumeEmbedUrl: '${escapeJs(resumeEmbedUrl)}',
   resumeDownloadUrl: '${escapeJs(resumeDownloadUrl)}',

@@ -18,12 +18,15 @@ Site runs on `http://localhost:5173` with `SITE_PUBLIC_URL=http://localhost:5173
 Configuration in `.env` (committed to repo):
 - `SITE_APP_NAME`, `SITE_MY_NAME`, `SITE_ROLE`, `SITE_AVAILABILITY` — profile metadata
 - `PROFILE_CITY`, `PROFILE_REGION`, `PROFILE_COUNTRY` — location metadata shown as `City, Region, Country`
+- `SITE_GDOC_SUMMARY_ID` — Google Doc ID used for the profile summary text
+- `SITE_GDOC_HIGHLIGHTS_ID` — Google Doc ID used for highlights (one line per highlight)
 - `SITE_GDOC_RESUME_ID` — the Google Docs document ID (format: `https://docs.google.com/document/d/{ID}/...`). Share the doc as "Anyone with the link can view".
 - `RESUME_PDF_FILE_NAME` — filename used by the PDF fallback download (default: `Kevin_Saravia_Resume.pdf`)
 - `SITE_PUBLIC_URL` — optional for local development; deployment workflows now set this per target
 
 Content editing:
-- `src/profileContent.ts` stores long-form summary and notes content for easier editing/versioning.
+- Google Docs provide runtime content for summary and highlights via `SITE_GDOC_SUMMARY_ID` and `SITE_GDOC_HIGHLIGHTS_ID`.
+- `src/profileContent.ts` is used as fallback content if Google Doc fetch fails.
 
 ### Option 1: Web Hosting (Recommended)
 
