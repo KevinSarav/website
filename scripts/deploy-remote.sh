@@ -57,11 +57,11 @@ if [[ -n "${GHCR_USERNAME:-}" || -n "${GHCR_TOKEN:-}" ]]; then
 fi
 
 if [[ -n "${docker_cfg_dir:-}" ]]; then
-  DOCKER_CONFIG="$docker_cfg_dir" docker compose pull website docx-converter gotenberg
+  DOCKER_CONFIG="$docker_cfg_dir" docker compose pull website
   cleanup_docker_cfg
   trap - EXIT
 else
-  docker compose pull website docx-converter gotenberg
+  docker compose pull website
 fi
 
 docker compose up -d --force-recreate --remove-orphans

@@ -12,10 +12,25 @@ summary="${SITE_SUMMARY:-REPLACE_ME}"
 location="${SITE_LOCATION:-REPLACE_ME}"
 availability="${SITE_AVAILABILITY:-REPLACE_ME}"
 public_url="${SITE_PUBLIC_URL:-}"
-resume_embed_url="${SITE_RESUME_EMBED_URL:-}"
-resume_download_url="${SITE_RESUME_DOWNLOAD_URL:-}"
+gdoc_resume_id="${SITE_GDOC_RESUME_ID:-}"
 note_1="${SITE_NOTE_1:-REPLACE_ME}"
 note_2="${SITE_NOTE_2:-REPLACE_ME}"
+
+# Compute resume URLs from Google Docs ID
+gdoc_base=""
+if [ -n "$gdoc_resume_id" ]; then
+  gdoc_base="https://docs.google.com/document/d/$gdoc_resume_id"
+fi
+
+resume_embed_url=""
+if [ -n "$gdoc_base" ]; then
+  resume_embed_url="$gdoc_base/preview"
+fi
+
+resume_download_url=""
+if [ -n "$gdoc_base" ]; then
+  resume_download_url="$gdoc_base/export?format=pdf"
+fi
 
 cat > /usr/share/nginx/html/runtime-config.js <<EOF
 window.__APP_CONFIG__ = {
@@ -26,6 +41,7 @@ window.__APP_CONFIG__ = {
   location: "$(escape_js "$location")",
   availability: "$(escape_js "$availability")",
   publicUrl: "$(escape_js "$public_url")",
+  gdocResumeId: "$(escape_js "$gdoc_resume_id")",
   resumeEmbedUrl: "$(escape_js "$resume_embed_url")",
   resumeDownloadUrl: "$(escape_js "$resume_download_url")",
   note1: "$(escape_js "$note_1")",
