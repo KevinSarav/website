@@ -3,36 +3,6 @@ import { createRoot } from 'react-dom/client'
 import { hasResume, siteContent } from './siteContent'
 import './styles.css'
 
-let isOpeningResumePdf = false
-
-function handleResumeDownloadClick() {
-  if (siteContent.resume.downloadUrl.length === 0 || isOpeningResumePdf) {
-    return
-  }
-
-  isOpeningResumePdf = true
-
-  const link = document.createElement('a')
-  link.href = siteContent.resume.downloadUrl
-  link.target = '_blank'
-  link.rel = 'noopener noreferrer'
-
-  try {
-    document.body.appendChild(link)
-    link.click()
-  } catch {
-    // Fallback path for strict popup environments.
-    link.target = ''
-    link.download = siteContent.resume.pdfFileName
-    link.click()
-  } finally {
-    link.remove()
-    window.setTimeout(() => {
-      isOpeningResumePdf = false
-    }, 300)
-  }
-}
-
 document.title = siteContent.appName
 
 const metaItems = [siteContent.role, siteContent.location, siteContent.availability].filter(
@@ -93,13 +63,14 @@ createRoot(document.getElementById('root')!).render(
                 </a>
               ) : null}
               {siteContent.resume.downloadUrl.length > 0 ? (
-                <button
-                  type="button"
+                <a
                   className="secondary-button"
-                  onClick={handleResumeDownloadClick}
+                  href={siteContent.resume.downloadUrl}
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   PDF
-                </button>
+                </a>
               ) : null}
             </div>
           </div>
