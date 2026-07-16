@@ -167,19 +167,22 @@ jobs:
           if [[ -z "$resume_id" && -n "${SITE_GDOC_RESUME_ID_SECRET:-}" ]]; then
             resume_id="$SITE_GDOC_RESUME_ID_SECRET"
           fi
+          if [[ -z "$resume_id" ]]; then
+            resume_id="$(read_env_value SITE_GDOC_RESUME_ID)"
+          fi
 
           resume_open_url="${SITE_RESUME_OPEN_URL_VAR:-}"
-          if [[ -z "$resume_open_url" ]]; then
+          if [[ -z "$resume_id" && -z "$resume_open_url" ]]; then
             resume_open_url="$(read_env_value SITE_RESUME_OPEN_URL)"
           fi
 
           resume_embed_url="${SITE_RESUME_EMBED_URL_VAR:-}"
-          if [[ -z "$resume_embed_url" ]]; then
+          if [[ -z "$resume_id" && -z "$resume_embed_url" ]]; then
             resume_embed_url="$(read_env_value SITE_RESUME_EMBED_URL)"
           fi
 
           resume_download_url="${SITE_RESUME_DOWNLOAD_URL_VAR:-}"
-          if [[ -z "$resume_download_url" ]]; then
+          if [[ -z "$resume_id" && -z "$resume_download_url" ]]; then
             resume_download_url="$(read_env_value SITE_RESUME_DOWNLOAD_URL)"
           fi
 

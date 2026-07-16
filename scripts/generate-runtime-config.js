@@ -49,10 +49,10 @@ const config = {
 // Extract and compute resume URLs
 const gdocResumeId = config.SITE_GDOC_RESUME_ID
 const gdocBase = gdocResumeId ? `https://docs.google.com/document/d/${gdocResumeId}` : ''
-const resumeOpenUrl = config.SITE_RESUME_OPEN_URL || gdocBase || ''
-const resumeEmbedUrl = config.SITE_RESUME_EMBED_URL || (gdocBase ? `${gdocBase}/preview` : '')
+const resumeOpenUrl = gdocBase || config.SITE_RESUME_OPEN_URL || ''
+const resumeEmbedUrl = gdocBase ? `${gdocBase}/preview` : config.SITE_RESUME_EMBED_URL || ''
 const resumeDownloadUrl =
-  config.SITE_RESUME_DOWNLOAD_URL || (gdocBase ? `${gdocBase}/export?format=pdf&download=1` : '')
+  gdocBase ? `${gdocBase}/export?format=pdf&download=1` : config.SITE_RESUME_DOWNLOAD_URL || ''
 
 // Generate runtime-config.js
 const configJs = `window.__APP_CONFIG__ = {

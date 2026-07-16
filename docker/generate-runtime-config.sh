@@ -40,16 +40,18 @@ if [ -n "$gdoc_base" ]; then
   resume_download_url="$gdoc_base/export?format=pdf&download=1"
 fi
 
-if [ -n "$resume_open_url_override" ]; then
-  resume_open_url="$resume_open_url_override"
-fi
+if [ -z "$gdoc_resume_id" ]; then
+  if [ -n "$resume_open_url_override" ]; then
+    resume_open_url="$resume_open_url_override"
+  fi
 
-if [ -n "$resume_embed_url_override" ]; then
-  resume_embed_url="$resume_embed_url_override"
-fi
+  if [ -n "$resume_embed_url_override" ]; then
+    resume_embed_url="$resume_embed_url_override"
+  fi
 
-if [ -n "$resume_download_url_override" ]; then
-  resume_download_url="$resume_download_url_override"
+  if [ -n "$resume_download_url_override" ]; then
+    resume_download_url="$resume_download_url_override"
+  fi
 fi
 
 cat > /usr/share/nginx/html/runtime-config.js <<EOF
