@@ -39,6 +39,7 @@ jobs:
           PROFILE_CITY_VAR: ${{ vars.PROFILE_CITY }}
           PROFILE_REGION_VAR: ${{ vars.PROFILE_REGION }}
           PROFILE_COUNTRY_VAR: ${{ vars.PROFILE_COUNTRY }}
+          PROFILE_AVAILABILITY_VAR: ${{ vars.PROFILE_AVAILABILITY }}
         run: |
           set -euo pipefail
 
@@ -63,6 +64,7 @@ jobs:
           echo "PROFILE_CITY=${PROFILE_CITY_VAR:-}" >> "$GITHUB_ENV"
           echo "PROFILE_REGION=${PROFILE_REGION_VAR:-}" >> "$GITHUB_ENV"
           echo "PROFILE_COUNTRY=${PROFILE_COUNTRY_VAR:-}" >> "$GITHUB_ENV"
+          echo "PROFILE_AVAILABILITY=${PROFILE_AVAILABILITY_VAR:-}" >> "$GITHUB_ENV"
 
           echo "Resolved SITE_PUBLIC_URL=$resolved_url"
           echo "Resolved VITE_BASE_PATH=$resolved_base"

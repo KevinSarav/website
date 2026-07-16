@@ -31,12 +31,13 @@ envContent.split('\n').forEach(line => {
 // Merge with process.env (environment variables take precedence)
 const config = {
   SITE_APP_NAME: process.env.SITE_APP_NAME || env.SITE_APP_NAME || 'Website',
-  SITE_MY_NAME: process.env.SITE_MY_NAME || env.SITE_MY_NAME || 'REPLACE_ME',
-  SITE_ROLE: process.env.SITE_ROLE || env.SITE_ROLE || 'REPLACE_ME',
+  PROFILE_MY_NAME: process.env.PROFILE_MY_NAME || env.PROFILE_MY_NAME || 'REPLACE_ME',
+  PROFILE_ROLE: process.env.PROFILE_ROLE || env.PROFILE_ROLE || 'REPLACE_ME',
   PROFILE_CITY: process.env.PROFILE_CITY || env.PROFILE_CITY || '',
   PROFILE_REGION: process.env.PROFILE_REGION || env.PROFILE_REGION || '',
   PROFILE_COUNTRY: process.env.PROFILE_COUNTRY || env.PROFILE_COUNTRY || '',
-  SITE_AVAILABILITY: process.env.SITE_AVAILABILITY || env.SITE_AVAILABILITY || 'REPLACE_ME',
+  PROFILE_AVAILABILITY:
+    process.env.PROFILE_AVAILABILITY || env.PROFILE_AVAILABILITY || 'REPLACE_ME',
   SITE_PUBLIC_URL: process.env.SITE_PUBLIC_URL || env.SITE_PUBLIC_URL || '',
   SITE_GDOC_RESUME_ID: process.env.SITE_GDOC_RESUME_ID || env.SITE_GDOC_RESUME_ID || '',
   SITE_GDOC_SUMMARY_ID: process.env.SITE_GDOC_SUMMARY_ID || env.SITE_GDOC_SUMMARY_ID || '',
@@ -60,10 +61,10 @@ const resumeDownloadUrl = gdocBase ? `${gdocBase}/export?format=pdf&download=1` 
 // Generate runtime-config.js
 const configJs = `window.__APP_CONFIG__ = {
   appName: '${escapeJs(config.SITE_APP_NAME)}',
-  myName: '${escapeJs(config.SITE_MY_NAME)}',
-  role: '${escapeJs(config.SITE_ROLE)}',
+  myName: '${escapeJs(config.PROFILE_MY_NAME)}',
+  role: '${escapeJs(config.PROFILE_ROLE)}',
   location: '${escapeJs(resolvedLocation)}',
-  availability: '${escapeJs(config.SITE_AVAILABILITY)}',
+  availability: '${escapeJs(config.PROFILE_AVAILABILITY)}',
   publicUrl: '${escapeJs(config.SITE_PUBLIC_URL)}',
   gdocSummaryId: '${escapeJs(config.SITE_GDOC_SUMMARY_ID)}',
   gdocHighlightsId: '${escapeJs(config.SITE_GDOC_HIGHLIGHTS_ID)}',

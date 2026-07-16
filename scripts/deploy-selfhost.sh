@@ -40,6 +40,7 @@ upsert_env() {
 upsert_env "PROFILE_CITY" "${PROFILE_CITY:-}"
 upsert_env "PROFILE_REGION" "${PROFILE_REGION:-}"
 upsert_env "PROFILE_COUNTRY" "${PROFILE_COUNTRY:-}"
+upsert_env "PROFILE_AVAILABILITY" "${PROFILE_AVAILABILITY:-}"
 
 if [[ -n "${GHCR_USERNAME:-}" || -n "${GHCR_TOKEN:-}" ]]; then
   if [[ -z "${GHCR_USERNAME:-}" || -z "${GHCR_TOKEN:-}" ]]; then

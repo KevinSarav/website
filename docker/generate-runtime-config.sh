@@ -6,12 +6,12 @@ escape_js() {
 }
 
 app_name="${SITE_APP_NAME:-Website}"
-my_name="${SITE_MY_NAME:-Kevin Saravia}"
-role="${SITE_ROLE:-REPLACE_ME}"
+my_name="${PROFILE_MY_NAME:-Kevin Saravia}"
+role="${PROFILE_ROLE:-REPLACE_ME}"
 profile_city="${PROFILE_CITY:-}"
 profile_region="${PROFILE_REGION:-}"
 profile_country="${PROFILE_COUNTRY:-}"
-availability="${SITE_AVAILABILITY:-REPLACE_ME}"
+availability="${PROFILE_AVAILABILITY:-REPLACE_ME}"
 public_url="${SITE_PUBLIC_URL:-}"
 gdoc_resume_id="${SITE_GDOC_RESUME_ID:-}"
 gdoc_summary_id="${SITE_GDOC_SUMMARY_ID:-}"

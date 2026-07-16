@@ -35,6 +35,7 @@ jobs:
           PROFILE_CITY_VAR: ${{ vars.PROFILE_CITY }}
           PROFILE_REGION_VAR: ${{ vars.PROFILE_REGION }}
           PROFILE_COUNTRY_VAR: ${{ vars.PROFILE_COUNTRY }}
+          PROFILE_AVAILABILITY_VAR: ${{ vars.PROFILE_AVAILABILITY }}
         run: |
           set -euo pipefail
 
@@ -55,6 +56,7 @@ jobs:
           echo "PROFILE_CITY=${PROFILE_CITY_VAR:-}" >> "$GITHUB_ENV"
           echo "PROFILE_REGION=${PROFILE_REGION_VAR:-}" >> "$GITHUB_ENV"
           echo "PROFILE_COUNTRY=${PROFILE_COUNTRY_VAR:-}" >> "$GITHUB_ENV"
+          echo "PROFILE_AVAILABILITY=${PROFILE_AVAILABILITY_VAR:-}" >> "$GITHUB_ENV"
           echo "Resolved SITE_PUBLIC_URL=$resolved_url"
 
       - name: Log in to GHCR
@@ -372,10 +374,11 @@ jobs:
           DEPLOY_CITY: ${{ steps.deploy_profile.outputs.city }}
           DEPLOY_REGION: ${{ steps.deploy_profile.outputs.region }}
           DEPLOY_COUNTRY: ${{ steps.deploy_profile.outputs.country }}
+          DEPLOY_AVAILABILITY: ${{ vars.PROFILE_AVAILABILITY }}
         run: |
           set -euo pipefail
 
-          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' PROFILE_CITY='${DEPLOY_CITY:-}' PROFILE_REGION='${DEPLOY_REGION:-}' PROFILE_COUNTRY='${DEPLOY_COUNTRY:-}' bash '$DEPLOY_PATH/scripts/deploy-selfhost.sh'"
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' PROFILE_CITY='${DEPLOY_CITY:-}' PROFILE_REGION='${DEPLOY_REGION:-}' PROFILE_COUNTRY='${DEPLOY_COUNTRY:-}' PROFILE_AVAILABILITY='${DEPLOY_AVAILABILITY:-}' bash '$DEPLOY_PATH/scripts/deploy-selfhost.sh'"
 
       - name: Trigger remote deploy
         if: steps.compare_geo.outputs.location_changed == 'true' && steps.sync_geo.outputs.sync_performed == 'true'

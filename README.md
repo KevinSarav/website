@@ -16,7 +16,7 @@ Site runs on `http://localhost:5173` with `SITE_PUBLIC_URL=http://localhost:5173
 ## Deployment
 
 Configuration in `.env` (committed to repo):
-- `SITE_APP_NAME`, `SITE_MY_NAME`, `SITE_ROLE`, `SITE_AVAILABILITY` — profile metadata
+- `SITE_APP_NAME`, `PROFILE_MY_NAME`, `PROFILE_ROLE`, `PROFILE_AVAILABILITY` — profile metadata
 - `PROFILE_CITY`, `PROFILE_REGION`, `PROFILE_COUNTRY` — location metadata shown as `City, Region, Country`
 - `SITE_GDOC_SUMMARY_ID` — Google Doc ID used for the profile summary text
 - `SITE_GDOC_HIGHLIGHTS_ID` — Google Doc ID used for highlights (one line per highlight)
