@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   packages: write
+  actions: write
 
 jobs:
   build-and-publish:
@@ -31,6 +32,9 @@ jobs:
         env:
           SITE_PUBLIC_URL_VAR: ${{ vars.SITE_PUBLIC_URL }}
           SITE_PUBLIC_URL_SECRET: ${{ secrets.SITE_PUBLIC_URL }}
+          PROFILE_CITY_VAR: ${{ vars.PROFILE_CITY }}
+          PROFILE_REGION_VAR: ${{ vars.PROFILE_REGION }}
+          PROFILE_COUNTRY_VAR: ${{ vars.PROFILE_COUNTRY }}
         run: |
           set -euo pipefail
 
@@ -48,6 +52,9 @@ jobs:
 
           echo "SITE_PUBLIC_URL=$resolved_url" >> "$GITHUB_ENV"
           echo "VITE_BASE_PATH=/" >> "$GITHUB_ENV"
+          echo "PROFILE_CITY=${PROFILE_CITY_VAR:-}" >> "$GITHUB_ENV"
+          echo "PROFILE_REGION=${PROFILE_REGION_VAR:-}" >> "$GITHUB_ENV"
+          echo "PROFILE_COUNTRY=${PROFILE_COUNTRY_VAR:-}" >> "$GITHUB_ENV"
           echo "Resolved SITE_PUBLIC_URL=$resolved_url"
 
       - name: Log in to GHCR
@@ -150,7 +157,92 @@ jobs:
         run: |
           set -euo pipefail
 
-          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' bash '$DEPLOY_PATH/scripts/deploy-selfhost.sh'"
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' PROFILE_CITY='${PROFILE_CITY:-}' PROFILE_REGION='${PROFILE_REGION:-}' PROFILE_COUNTRY='${PROFILE_COUNTRY:-}' bash '$DEPLOY_PATH/scripts/deploy-selfhost.sh'"
+
+      - name: Detect self-host geolocation
+        id: detect_geo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          geo_json="$(ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "curl -fsSL https://ipapi.co/json/")"
+
+          city="$(printf '%s' "$geo_json" | jq -r '.city // empty')"
+          region="$(printf '%s' "$geo_json" | jq -r '.region // empty')"
+          country="$(printf '%s' "$geo_json" | jq -r '.country_name // empty')"
+
+          echo "city=$city" >> "$GITHUB_OUTPUT"
+          echo "region=$region" >> "$GITHUB_OUTPUT"
+          echo "country=$country" >> "$GITHUB_OUTPUT"
+
+      - name: Compare profile location with geolocation
+        id: compare_geo
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_CITY: ${{ steps.detect_geo.outputs.city }}
+          NEW_REGION: ${{ steps.detect_geo.outputs.region }}
+          NEW_COUNTRY: ${{ steps.detect_geo.outputs.country }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${NEW_CITY:-}" || -z "${NEW_REGION:-}" || -z "${NEW_COUNTRY:-}" ]]; then
+            echo "Incomplete geolocation from self-host. Skipping profile location sync."
+            echo "location_changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          repo="$GITHUB_REPOSITORY"
+
+          get_env_var_value() {
+            local env_name="$1"
+            local key="$2"
+            gh api "repos/$repo/environments/$env_name/variables" \
+              --jq ".variables[]? | select(.name == \"$key\") | .value" 2>/dev/null || true
+          }
+
+          current_city="$(get_env_var_value production-online PROFILE_CITY)"
+          current_region="$(get_env_var_value production-online PROFILE_REGION)"
+          current_country="$(get_env_var_value production-online PROFILE_COUNTRY)"
+
+          if [[ "$NEW_CITY" == "$current_city" && "$NEW_REGION" == "$current_region" && "$NEW_COUNTRY" == "$current_country" ]]; then
+            echo "Profile location unchanged."
+            echo "location_changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "location_changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Sync profile location vars
+        if: steps.compare_geo.outputs.location_changed == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_CITY: ${{ steps.detect_geo.outputs.city }}
+          NEW_REGION: ${{ steps.detect_geo.outputs.region }}
+          NEW_COUNTRY: ${{ steps.detect_geo.outputs.country }}
+        run: |
+          set -euo pipefail
+
+          repo="$GITHUB_REPOSITORY"
+
+          for env_name in production-online production-selfhost; do
+            gh variable set PROFILE_CITY --env "$env_name" --repo "$repo" --body "$NEW_CITY"
+            gh variable set PROFILE_REGION --env "$env_name" --repo "$repo" --body "$NEW_REGION"
+            gh variable set PROFILE_COUNTRY --env "$env_name" --repo "$repo" --body "$NEW_COUNTRY"
+          done
+
+          echo "Updated profile location to: $NEW_CITY, $NEW_REGION, $NEW_COUNTRY"
+
+      - name: Trigger Pages redeploy
+        if: steps.compare_geo.outputs.location_changed == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh workflow run deploy-remote.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"
+          echo "Triggered deploy-remote.yml due to location change."
 
       - name: Cleanup old GHCR versions (keep 3)
         shell: bash

@@ -36,6 +36,9 @@ jobs:
         shell: bash
         env:
           SITE_PUBLIC_URL_OVERRIDE: ${{ vars.SITE_PUBLIC_URL }}
+          PROFILE_CITY_VAR: ${{ vars.PROFILE_CITY }}
+          PROFILE_REGION_VAR: ${{ vars.PROFILE_REGION }}
+          PROFILE_COUNTRY_VAR: ${{ vars.PROFILE_COUNTRY }}
         run: |
           set -euo pipefail
 
@@ -57,6 +60,9 @@ jobs:
 
           echo "SITE_PUBLIC_URL=$resolved_url" >> "$GITHUB_ENV"
           echo "VITE_BASE_PATH=$resolved_base" >> "$GITHUB_ENV"
+          echo "PROFILE_CITY=${PROFILE_CITY_VAR:-}" >> "$GITHUB_ENV"
+          echo "PROFILE_REGION=${PROFILE_REGION_VAR:-}" >> "$GITHUB_ENV"
+          echo "PROFILE_COUNTRY=${PROFILE_COUNTRY_VAR:-}" >> "$GITHUB_ENV"
 
           echo "Resolved SITE_PUBLIC_URL=$resolved_url"
           echo "Resolved VITE_BASE_PATH=$resolved_base"

@@ -16,7 +16,8 @@ Site runs on `http://localhost:5173` with `SITE_PUBLIC_URL=http://localhost:5173
 ## Deployment
 
 Configuration in `.env` (committed to repo):
-- `SITE_APP_NAME`, `SITE_MY_NAME`, `SITE_ROLE`, `SITE_LOCATION`, `SITE_AVAILABILITY` — profile metadata
+- `SITE_APP_NAME`, `SITE_MY_NAME`, `SITE_ROLE`, `SITE_AVAILABILITY` — profile metadata
+- `PROFILE_CITY`, `PROFILE_REGION`, `PROFILE_COUNTRY` — location metadata shown as `City, Region, Country`
 - `SITE_GDOC_RESUME_ID` — the Google Docs document ID (format: `https://docs.google.com/document/d/{ID}/...`). Share the doc as "Anyone with the link can view".
 - `RESUME_PDF_FILE_NAME` — filename used by the PDF fallback download (default: `Kevin_Saravia_Resume.pdf`)
 - `SITE_PUBLIC_URL` — optional for local development; deployment workflows now set this per target
@@ -66,7 +67,8 @@ Docker workflow behavior:
 - Resolves `SITE_PUBLIC_URL` using `vars.SITE_PUBLIC_URL` (or `secrets.SITE_PUBLIC_URL`) from environment `production-selfhost`, then `CNAME`.
 - Fails fast if no production URL can be resolved.
 - Passes `SITE_PUBLIC_URL` into image build and runtime config generation.
-- Uses `SITE_GDOC_RESUME_ID` from server runtime `.env`/`.env.sops`.
+- Uses `SITE_GDOC_RESUME_ID` from server runtime `.env`.
+- Detects geolocation from the self-host server IP, syncs `PROFILE_CITY`/`PROFILE_REGION`/`PROFILE_COUNTRY` env vars when changed, and triggers the remote workflow to keep online deployment in sync.
 
 ### Environment Variables Per Deployment
 

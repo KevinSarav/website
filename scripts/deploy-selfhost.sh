@@ -21,6 +21,26 @@ git fetch --prune origin
 git checkout "$DEPLOY_BRANCH"
 git reset --hard "origin/$DEPLOY_BRANCH"
 
+upsert_env() {
+  local key="$1"
+  local value="$2"
+
+  if [[ -z "${value}" ]]; then
+    return 0
+  fi
+
+  touch .env
+  if grep -qE "^${key}=" .env; then
+    sed -i "s#^${key}=.*#${key}=${value}#" .env
+  else
+    printf '%s=%s\n' "$key" "$value" >> .env
+  fi
+}
+
+upsert_env "PROFILE_CITY" "${PROFILE_CITY:-}"
+upsert_env "PROFILE_REGION" "${PROFILE_REGION:-}"
+upsert_env "PROFILE_COUNTRY" "${PROFILE_COUNTRY:-}"
+
 if [[ -n "${GHCR_USERNAME:-}" || -n "${GHCR_TOKEN:-}" ]]; then
   if [[ -z "${GHCR_USERNAME:-}" || -z "${GHCR_TOKEN:-}" ]]; then
     echo "GHCR auth is partially configured. Set both GHCR_USERNAME and GHCR_TOKEN or neither."

@@ -8,11 +8,34 @@ escape_js() {
 app_name="${SITE_APP_NAME:-Website}"
 my_name="${SITE_MY_NAME:-Kevin Saravia}"
 role="${SITE_ROLE:-REPLACE_ME}"
-location="${SITE_LOCATION:-REPLACE_ME}"
+profile_city="${PROFILE_CITY:-}"
+profile_region="${PROFILE_REGION:-}"
+profile_country="${PROFILE_COUNTRY:-}"
 availability="${SITE_AVAILABILITY:-REPLACE_ME}"
 public_url="${SITE_PUBLIC_URL:-}"
 gdoc_resume_id="${SITE_GDOC_RESUME_ID:-}"
 resume_pdf_file_name="${RESUME_PDF_FILE_NAME:-Kevin_Saravia_Resume.pdf}"
+
+location_parts=""
+if [ -n "$profile_city" ]; then
+  location_parts="$profile_city"
+fi
+if [ -n "$profile_region" ]; then
+  if [ -n "$location_parts" ]; then
+    location_parts="$location_parts, $profile_region"
+  else
+    location_parts="$profile_region"
+  fi
+fi
+if [ -n "$profile_country" ]; then
+  if [ -n "$location_parts" ]; then
+    location_parts="$location_parts, $profile_country"
+  else
+    location_parts="$profile_country"
+  fi
+fi
+
+location="$location_parts"
 
 # Compute resume URLs from Google Docs ID
 gdoc_base=""

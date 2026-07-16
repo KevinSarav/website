@@ -33,13 +33,20 @@ const config = {
   SITE_APP_NAME: process.env.SITE_APP_NAME || env.SITE_APP_NAME || 'Website',
   SITE_MY_NAME: process.env.SITE_MY_NAME || env.SITE_MY_NAME || 'REPLACE_ME',
   SITE_ROLE: process.env.SITE_ROLE || env.SITE_ROLE || 'REPLACE_ME',
-  SITE_LOCATION: process.env.SITE_LOCATION || env.SITE_LOCATION || 'REPLACE_ME',
+  PROFILE_CITY: process.env.PROFILE_CITY || env.PROFILE_CITY || '',
+  PROFILE_REGION: process.env.PROFILE_REGION || env.PROFILE_REGION || '',
+  PROFILE_COUNTRY: process.env.PROFILE_COUNTRY || env.PROFILE_COUNTRY || '',
   SITE_AVAILABILITY: process.env.SITE_AVAILABILITY || env.SITE_AVAILABILITY || 'REPLACE_ME',
   SITE_PUBLIC_URL: process.env.SITE_PUBLIC_URL || env.SITE_PUBLIC_URL || '',
   SITE_GDOC_RESUME_ID: process.env.SITE_GDOC_RESUME_ID || env.SITE_GDOC_RESUME_ID || '',
   RESUME_PDF_FILE_NAME:
     process.env.RESUME_PDF_FILE_NAME || env.RESUME_PDF_FILE_NAME || 'Kevin_Saravia_Resume.pdf',
 }
+
+const locationParts = [config.PROFILE_CITY, config.PROFILE_REGION, config.PROFILE_COUNTRY]
+  .map((value) => value.trim())
+  .filter((value) => value.length > 0)
+const resolvedLocation = locationParts.join(', ')
 
 // Extract and compute resume URLs
 const gdocResumeId = config.SITE_GDOC_RESUME_ID
@@ -53,7 +60,7 @@ const configJs = `window.__APP_CONFIG__ = {
   appName: '${escapeJs(config.SITE_APP_NAME)}',
   myName: '${escapeJs(config.SITE_MY_NAME)}',
   role: '${escapeJs(config.SITE_ROLE)}',
-  location: '${escapeJs(config.SITE_LOCATION)}',
+  location: '${escapeJs(resolvedLocation)}',
   availability: '${escapeJs(config.SITE_AVAILABILITY)}',
   publicUrl: '${escapeJs(config.SITE_PUBLIC_URL)}',
   resumeOpenUrl: '${escapeJs(resumeOpenUrl)}',
