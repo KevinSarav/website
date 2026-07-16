@@ -5,9 +5,15 @@ import './styles.css'
 
 function handleResumeDownloadClick() {
   if (siteContent.resume.downloadUrl.length > 0) {
+    const openedWindow = window.open(siteContent.resume.downloadUrl, '_blank', 'noopener,noreferrer')
+    if (openedWindow) {
+      openedWindow.opener = null
+      return
+    }
+
     const link = document.createElement('a')
     link.href = siteContent.resume.downloadUrl
-    link.download = 'resume.pdf'
+    link.download = siteContent.resume.pdfFileName
     link.rel = 'noopener noreferrer'
     document.body.appendChild(link)
     link.click()
@@ -71,7 +77,7 @@ createRoot(document.getElementById('root')!).render(
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Open resume
+                  Google Docs
                 </a>
               ) : null}
               {siteContent.resume.downloadUrl.length > 0 ? (
@@ -80,7 +86,7 @@ createRoot(document.getElementById('root')!).render(
                   className="secondary-button"
                   onClick={handleResumeDownloadClick}
                 >
-                  Download PDF
+                  PDF
                 </button>
               ) : null}
             </div>
@@ -95,7 +101,7 @@ createRoot(document.getElementById('root')!).render(
                 loading="lazy"
               />
               {siteContent.resume.downloadUrl.length > 0 ? (
-                <p className="resume-help">If preview is unavailable, open the Google Doc or download the PDF.</p>
+                <p className="resume-help">If preview is unavailable, open the Google Docs or PDF.</p>
               ) : null}
             </>
           ) : (

@@ -9,6 +9,7 @@ export type RuntimeConfig = {
   resumeOpenUrl: string
   resumeEmbedUrl: string
   resumeDownloadUrl: string
+  resumePdfFileName: string
   note1: string
   note2: string
 }
@@ -41,6 +42,7 @@ export const runtimeConfig: RuntimeConfig = {
   resumeOpenUrl: getString(window.__APP_CONFIG__?.resumeOpenUrl),
   resumeEmbedUrl: getString(window.__APP_CONFIG__?.resumeEmbedUrl),
   resumeDownloadUrl: getString(window.__APP_CONFIG__?.resumeDownloadUrl),
+  resumePdfFileName: getString(window.__APP_CONFIG__?.resumePdfFileName, 'Kevin_Saravia_Resume.pdf'),
   note1: getString(window.__APP_CONFIG__?.note1),
   note2: getString(window.__APP_CONFIG__?.note2),
 }

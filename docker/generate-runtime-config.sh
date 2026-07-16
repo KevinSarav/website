@@ -6,13 +6,14 @@ escape_js() {
 }
 
 app_name="${SITE_APP_NAME:-Website}"
-my_name="${SITE_MY_NAME:-REPLACE_ME}"
+my_name="${SITE_MY_NAME:-Kevin Saravia}"
 role="${SITE_ROLE:-REPLACE_ME}"
 summary="${SITE_SUMMARY:-REPLACE_ME}"
 location="${SITE_LOCATION:-REPLACE_ME}"
 availability="${SITE_AVAILABILITY:-REPLACE_ME}"
 public_url="${SITE_PUBLIC_URL:-}"
 gdoc_resume_id="${SITE_GDOC_RESUME_ID:-}"
+resume_pdf_file_name="${RESUME_PDF_FILE_NAME:-Kevin_Saravia_Resume.pdf}"
 note_1="${SITE_NOTE_1:-REPLACE_ME}"
 note_2="${SITE_NOTE_2:-REPLACE_ME}"
 
@@ -50,6 +51,7 @@ window.__APP_CONFIG__ = {
   resumeOpenUrl: "$(escape_js "$resume_open_url")",
   resumeEmbedUrl: "$(escape_js "$resume_embed_url")",
   resumeDownloadUrl: "$(escape_js "$resume_download_url")",
+  resumePdfFileName: "$(escape_js "$resume_pdf_file_name")",
   note1: "$(escape_js "$note_1")",
   note2: "$(escape_js "$note_2")"
 };

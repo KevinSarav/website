@@ -13,6 +13,7 @@ export const siteContent = {
       runtimeConfig.resumeOpenUrl || runtimeConfig.resumeEmbedUrl || runtimeConfig.resumeDownloadUrl,
     embedUrl: runtimeConfig.resumeEmbedUrl,
     downloadUrl: runtimeConfig.resumeDownloadUrl,
+    pdfFileName: runtimeConfig.resumePdfFileName,
   },
 } as const
 

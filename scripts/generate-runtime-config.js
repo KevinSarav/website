@@ -38,6 +38,8 @@ const config = {
   SITE_AVAILABILITY: process.env.SITE_AVAILABILITY || env.SITE_AVAILABILITY || 'REPLACE_ME',
   SITE_PUBLIC_URL: process.env.SITE_PUBLIC_URL || env.SITE_PUBLIC_URL || '',
   SITE_GDOC_RESUME_ID: process.env.SITE_GDOC_RESUME_ID || env.SITE_GDOC_RESUME_ID || '',
+  RESUME_PDF_FILE_NAME:
+    process.env.RESUME_PDF_FILE_NAME || env.RESUME_PDF_FILE_NAME || 'Kevin_Saravia_Resume.pdf',
   SITE_NOTE_1: process.env.SITE_NOTE_1 || env.SITE_NOTE_1 || 'REPLACE_ME',
   SITE_NOTE_2: process.env.SITE_NOTE_2 || env.SITE_NOTE_2 || 'REPLACE_ME',
 }
@@ -61,6 +63,7 @@ const configJs = `window.__APP_CONFIG__ = {
   resumeOpenUrl: '${escapeJs(resumeOpenUrl)}',
   resumeEmbedUrl: '${escapeJs(resumeEmbedUrl)}',
   resumeDownloadUrl: '${escapeJs(resumeDownloadUrl)}',
+  resumePdfFileName: '${escapeJs(config.RESUME_PDF_FILE_NAME)}',
   note1: '${escapeJs(config.SITE_NOTE_1)}',
   note2: '${escapeJs(config.SITE_NOTE_2)}',
 }

@@ -18,6 +18,7 @@ Site runs on `http://localhost:5173` with `SITE_PUBLIC_URL=http://localhost:5173
 Configuration in `.env` (committed to repo):
 - `SITE_APP_NAME`, `SITE_MY_NAME`, `SITE_ROLE`, etc. — portfolio content
 - `SITE_GDOC_RESUME_ID` — the Google Docs document ID (format: `https://docs.google.com/document/d/{ID}/...`). Share the doc as "Anyone with the link can view".
+- `RESUME_PDF_FILE_NAME` — filename used by the PDF fallback download (default: `Kevin_Saravia_Resume.pdf`)
 - `SITE_PUBLIC_URL` — optional for local development; deployment workflows now set this per target
 
 ### Option 1: Web Hosting (Recommended)
