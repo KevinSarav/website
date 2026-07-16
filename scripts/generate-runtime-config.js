@@ -45,8 +45,9 @@ const config = {
 // Extract and compute resume URLs
 const gdocResumeId = config.SITE_GDOC_RESUME_ID
 const gdocBase = gdocResumeId ? `https://docs.google.com/document/d/${gdocResumeId}` : ''
+const resumeOpenUrl = gdocBase || ''
 const resumeEmbedUrl = gdocBase ? `${gdocBase}/preview` : ''
-const resumeDownloadUrl = gdocBase ? `${gdocBase}/export?format=pdf` : ''
+const resumeDownloadUrl = gdocBase ? `${gdocBase}/export?format=pdf&download=1` : ''
 
 // Generate runtime-config.js
 const configJs = `window.__APP_CONFIG__ = {
@@ -57,6 +58,7 @@ const configJs = `window.__APP_CONFIG__ = {
   location: '${escapeJs(config.SITE_LOCATION)}',
   availability: '${escapeJs(config.SITE_AVAILABILITY)}',
   publicUrl: '${escapeJs(config.SITE_PUBLIC_URL)}',
+  resumeOpenUrl: '${escapeJs(resumeOpenUrl)}',
   resumeEmbedUrl: '${escapeJs(resumeEmbedUrl)}',
   resumeDownloadUrl: '${escapeJs(resumeDownloadUrl)}',
   note1: '${escapeJs(config.SITE_NOTE_1)}',

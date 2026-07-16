@@ -57,7 +57,13 @@ async function handleResumeDownloadClick() {
     await downloadResumePdf()
   } catch {
     if (siteContent.resume.downloadUrl.length > 0) {
-      window.location.assign(siteContent.resume.downloadUrl)
+      const link = document.createElement('a')
+      link.href = siteContent.resume.downloadUrl
+      link.download = 'resume.pdf'
+      link.rel = 'noopener noreferrer'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
     }
   }
 }
@@ -111,10 +117,10 @@ createRoot(document.getElementById('root')!).render(
               <h2>View resume</h2>
             </div>
             <div className="resume-actions">
-              {siteContent.resume.downloadUrl.length > 0 ? (
+              {siteContent.resume.openUrl.length > 0 ? (
                 <a
                   className="primary-button"
-                  href={siteContent.resume.downloadUrl}
+                  href={siteContent.resume.openUrl}
                   target="_blank"
                   rel="noreferrer"
                 >

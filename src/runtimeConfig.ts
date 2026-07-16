@@ -6,6 +6,7 @@ export type RuntimeConfig = {
   location: string
   availability: string
   publicUrl: string
+  resumeOpenUrl: string
   resumeEmbedUrl: string
   resumeDownloadUrl: string
   note1: string
@@ -37,6 +38,7 @@ export const runtimeConfig: RuntimeConfig = {
   location: getString(window.__APP_CONFIG__?.location),
   availability: getString(window.__APP_CONFIG__?.availability),
   publicUrl: getString(window.__APP_CONFIG__?.publicUrl),
+  resumeOpenUrl: getString(window.__APP_CONFIG__?.resumeOpenUrl),
   resumeEmbedUrl: getString(window.__APP_CONFIG__?.resumeEmbedUrl),
   resumeDownloadUrl: getString(window.__APP_CONFIG__?.resumeDownloadUrl),
   note1: getString(window.__APP_CONFIG__?.note1),

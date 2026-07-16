@@ -27,9 +27,14 @@ if [ -n "$gdoc_base" ]; then
   resume_embed_url="$gdoc_base/preview"
 fi
 
+resume_open_url=""
+if [ -n "$gdoc_base" ]; then
+  resume_open_url="$gdoc_base"
+fi
+
 resume_download_url=""
 if [ -n "$gdoc_base" ]; then
-  resume_download_url="$gdoc_base/export?format=pdf"
+  resume_download_url="$gdoc_base/export?format=pdf&download=1"
 fi
 
 cat > /usr/share/nginx/html/runtime-config.js <<EOF
@@ -42,6 +47,7 @@ window.__APP_CONFIG__ = {
   availability: "$(escape_js "$availability")",
   publicUrl: "$(escape_js "$public_url")",
   gdocResumeId: "$(escape_js "$gdoc_resume_id")",
+  resumeOpenUrl: "$(escape_js "$resume_open_url")",
   resumeEmbedUrl: "$(escape_js "$resume_embed_url")",
   resumeDownloadUrl: "$(escape_js "$resume_download_url")",
   note1: "$(escape_js "$note_1")",

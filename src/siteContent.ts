@@ -9,10 +9,13 @@ export const siteContent = {
   availability: runtimeConfig.availability,
   notes: [runtimeConfig.note1, runtimeConfig.note2].filter((note) => note.length > 0),
   resume: {
+    openUrl: runtimeConfig.resumeOpenUrl,
     embedUrl: runtimeConfig.resumeEmbedUrl,
     downloadUrl: runtimeConfig.resumeDownloadUrl,
   },
 } as const
 
 export const hasResume =
-  siteContent.resume.embedUrl.length > 0 || siteContent.resume.downloadUrl.length > 0
+  siteContent.resume.openUrl.length > 0 ||
+  siteContent.resume.embedUrl.length > 0 ||
+  siteContent.resume.downloadUrl.length > 0
