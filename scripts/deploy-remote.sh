@@ -37,6 +37,27 @@ if [[ -f .env.sops ]]; then
   trap - EXIT
 fi
 
+upsert_env() {
+  local key="$1"
+  local value="$2"
+
+  if [[ -z "${value}" ]]; then
+    return 0
+  fi
+
+  touch .env
+  if grep -qE "^${key}=" .env; then
+    sed -i "s#^${key}=.*#${key}=${value}#" .env
+  else
+    printf '%s=%s\n' "$key" "$value" >> .env
+  fi
+}
+
+upsert_env "SITE_GDOC_RESUME_ID" "${SITE_GDOC_RESUME_ID:-}"
+upsert_env "SITE_RESUME_OPEN_URL" "${SITE_RESUME_OPEN_URL:-}"
+upsert_env "SITE_RESUME_EMBED_URL" "${SITE_RESUME_EMBED_URL:-}"
+upsert_env "SITE_RESUME_DOWNLOAD_URL" "${SITE_RESUME_DOWNLOAD_URL:-}"
+
 if [[ -n "${GHCR_USERNAME:-}" || -n "${GHCR_TOKEN:-}" ]]; then
   if [[ -z "${GHCR_USERNAME:-}" || -z "${GHCR_TOKEN:-}" ]]; then
     echo "GHCR auth is partially configured. Set both GHCR_USERNAME and GHCR_TOKEN or neither."

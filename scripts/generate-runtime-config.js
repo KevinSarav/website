@@ -38,6 +38,10 @@ const config = {
   SITE_AVAILABILITY: process.env.SITE_AVAILABILITY || env.SITE_AVAILABILITY || 'REPLACE_ME',
   SITE_PUBLIC_URL: process.env.SITE_PUBLIC_URL || env.SITE_PUBLIC_URL || '',
   SITE_GDOC_RESUME_ID: process.env.SITE_GDOC_RESUME_ID || env.SITE_GDOC_RESUME_ID || '',
+  SITE_RESUME_OPEN_URL: process.env.SITE_RESUME_OPEN_URL || env.SITE_RESUME_OPEN_URL || '',
+  SITE_RESUME_EMBED_URL: process.env.SITE_RESUME_EMBED_URL || env.SITE_RESUME_EMBED_URL || '',
+  SITE_RESUME_DOWNLOAD_URL:
+    process.env.SITE_RESUME_DOWNLOAD_URL || env.SITE_RESUME_DOWNLOAD_URL || '',
   SITE_NOTE_1: process.env.SITE_NOTE_1 || env.SITE_NOTE_1 || 'REPLACE_ME',
   SITE_NOTE_2: process.env.SITE_NOTE_2 || env.SITE_NOTE_2 || 'REPLACE_ME',
 }
@@ -45,9 +49,10 @@ const config = {
 // Extract and compute resume URLs
 const gdocResumeId = config.SITE_GDOC_RESUME_ID
 const gdocBase = gdocResumeId ? `https://docs.google.com/document/d/${gdocResumeId}` : ''
-const resumeOpenUrl = gdocBase || ''
-const resumeEmbedUrl = gdocBase ? `${gdocBase}/preview` : ''
-const resumeDownloadUrl = gdocBase ? `${gdocBase}/export?format=pdf&download=1` : ''
+const resumeOpenUrl = config.SITE_RESUME_OPEN_URL || gdocBase || ''
+const resumeEmbedUrl = config.SITE_RESUME_EMBED_URL || (gdocBase ? `${gdocBase}/preview` : '')
+const resumeDownloadUrl =
+  config.SITE_RESUME_DOWNLOAD_URL || (gdocBase ? `${gdocBase}/export?format=pdf&download=1` : '')
 
 // Generate runtime-config.js
 const configJs = `window.__APP_CONFIG__ = {

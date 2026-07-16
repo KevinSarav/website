@@ -13,6 +13,9 @@ location="${SITE_LOCATION:-REPLACE_ME}"
 availability="${SITE_AVAILABILITY:-REPLACE_ME}"
 public_url="${SITE_PUBLIC_URL:-}"
 gdoc_resume_id="${SITE_GDOC_RESUME_ID:-}"
+resume_open_url_override="${SITE_RESUME_OPEN_URL:-}"
+resume_embed_url_override="${SITE_RESUME_EMBED_URL:-}"
+resume_download_url_override="${SITE_RESUME_DOWNLOAD_URL:-}"
 note_1="${SITE_NOTE_1:-REPLACE_ME}"
 note_2="${SITE_NOTE_2:-REPLACE_ME}"
 
@@ -35,6 +38,18 @@ fi
 resume_download_url=""
 if [ -n "$gdoc_base" ]; then
   resume_download_url="$gdoc_base/export?format=pdf&download=1"
+fi
+
+if [ -n "$resume_open_url_override" ]; then
+  resume_open_url="$resume_open_url_override"
+fi
+
+if [ -n "$resume_embed_url_override" ]; then
+  resume_embed_url="$resume_embed_url_override"
+fi
+
+if [ -n "$resume_download_url_override" ]; then
+  resume_download_url="$resume_download_url_override"
 fi
 
 cat > /usr/share/nginx/html/runtime-config.js <<EOF
