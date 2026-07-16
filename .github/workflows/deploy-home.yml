@@ -203,7 +203,7 @@ jobs:
         id: compare_geo
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.LOCATION_SYNC_TOKEN || github.token }}
           NEW_CITY: ${{ steps.detect_geo.outputs.city }}
           NEW_REGION: ${{ steps.detect_geo.outputs.region }}
           NEW_COUNTRY: ${{ steps.detect_geo.outputs.country }}
@@ -217,10 +217,12 @@ jobs:
           fi
 
           repo="$GITHUB_REPOSITORY"
+          err_log="$(mktemp)"
+          trap 'rm -f "$err_log"' EXIT
 
           get_repo_var_value() {
             local key="$1"
-            gh api "repos/$repo/actions/variables/$key" --jq '.value'
+            gh api "repos/$repo/actions/variables" --jq ".variables[]? | select(.name == \"$key\") | .value" 2>"$err_log"
           }
 
           normalize_value() {
@@ -230,21 +232,36 @@ jobs:
               | tr '[:upper:]' '[:lower:]'
           }
 
-          if ! current_city="$(get_repo_var_value PROFILE_CITY 2>/dev/null)"; then
+          if ! current_city="$(get_repo_var_value PROFILE_CITY)"; then
+            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
+              echo "::warning title=Location compare skipped::Token cannot read repository variables."
+            else
+              cat "$err_log"
+            fi
             echo "Could not read PROFILE_CITY from repo variables. Skipping profile location sync."
             echo "location_changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if ! current_region="$(get_repo_var_value PROFILE_REGION 2>/dev/null)"; then
+          if ! current_region="$(get_repo_var_value PROFILE_REGION)"; then
+            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
+              echo "::warning title=Location compare skipped::Token cannot read repository variables."
+            else
+              cat "$err_log"
+            fi
             echo "Could not read PROFILE_REGION from repo variables. Skipping profile location sync."
             echo "location_changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if ! current_country="$(get_repo_var_value PROFILE_COUNTRY 2>/dev/null)"; then
+          if ! current_country="$(get_repo_var_value PROFILE_COUNTRY)"; then
+            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
+              echo "::warning title=Location compare skipped::Token cannot read repository variables."
+            else
+              cat "$err_log"
+            fi
             echo "Could not read PROFILE_COUNTRY from repo variables. Skipping profile location sync."
             echo "location_changed=false" >> "$GITHUB_OUTPUT"
             exit 0
-          }
+          fi
 
           new_city_normalized="$(normalize_value "$NEW_CITY")"
           new_region_normalized="$(normalize_value "$NEW_REGION")"
@@ -321,7 +338,7 @@ jobs:
         id: deploy_profile
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.LOCATION_SYNC_TOKEN || github.token }}
           NEW_CITY: ${{ steps.detect_geo.outputs.city }}
           NEW_REGION: ${{ steps.detect_geo.outputs.region }}
           NEW_COUNTRY: ${{ steps.detect_geo.outputs.country }}
@@ -329,14 +346,19 @@ jobs:
           set -euo pipefail
 
           repo="$GITHUB_REPOSITORY"
-          city="${NEW_CITY:-}"
-          region="${NEW_REGION:-}"
-          country="${NEW_COUNTRY:-}"
+          city="$(gh api "repos/$repo/actions/variables" --jq '.variables[]? | select(.name == "PROFILE_CITY") | .value' 2>/dev/null || true)"
+          region="$(gh api "repos/$repo/actions/variables" --jq '.variables[]? | select(.name == "PROFILE_REGION") | .value' 2>/dev/null || true)"
+          country="$(gh api "repos/$repo/actions/variables" --jq '.variables[]? | select(.name == "PROFILE_COUNTRY") | .value' 2>/dev/null || true)"
 
-          if [[ -z "$city" || -z "$region" || -z "$country" ]]; then
-            city="$(gh api "repos/$repo/actions/variables/PROFILE_CITY" --jq '.value' 2>/dev/null || true)"
-            region="$(gh api "repos/$repo/actions/variables/PROFILE_REGION" --jq '.value' 2>/dev/null || true)"
-            country="$(gh api "repos/$repo/actions/variables/PROFILE_COUNTRY" --jq '.value' 2>/dev/null || true)"
+          # Prefer repo variables as source of truth; only fall back to detected geolocation when missing.
+          if [[ -z "$city" ]]; then
+            city="${NEW_CITY:-}"
+          fi
+          if [[ -z "$region" ]]; then
+            region="${NEW_REGION:-}"
+          fi
+          if [[ -z "$country" ]]; then
+            country="${NEW_COUNTRY:-}"
           fi
 
           echo "city=$city" >> "$GITHUB_OUTPUT"
