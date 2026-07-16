@@ -33,15 +33,12 @@ const config = {
   SITE_APP_NAME: process.env.SITE_APP_NAME || env.SITE_APP_NAME || 'Website',
   SITE_MY_NAME: process.env.SITE_MY_NAME || env.SITE_MY_NAME || 'REPLACE_ME',
   SITE_ROLE: process.env.SITE_ROLE || env.SITE_ROLE || 'REPLACE_ME',
-  SITE_SUMMARY: process.env.SITE_SUMMARY || env.SITE_SUMMARY || 'REPLACE_ME',
   SITE_LOCATION: process.env.SITE_LOCATION || env.SITE_LOCATION || 'REPLACE_ME',
   SITE_AVAILABILITY: process.env.SITE_AVAILABILITY || env.SITE_AVAILABILITY || 'REPLACE_ME',
   SITE_PUBLIC_URL: process.env.SITE_PUBLIC_URL || env.SITE_PUBLIC_URL || '',
   SITE_GDOC_RESUME_ID: process.env.SITE_GDOC_RESUME_ID || env.SITE_GDOC_RESUME_ID || '',
   RESUME_PDF_FILE_NAME:
     process.env.RESUME_PDF_FILE_NAME || env.RESUME_PDF_FILE_NAME || 'Kevin_Saravia_Resume.pdf',
-  SITE_NOTE_1: process.env.SITE_NOTE_1 || env.SITE_NOTE_1 || 'REPLACE_ME',
-  SITE_NOTE_2: process.env.SITE_NOTE_2 || env.SITE_NOTE_2 || 'REPLACE_ME',
 }
 
 // Extract and compute resume URLs
@@ -56,7 +53,6 @@ const configJs = `window.__APP_CONFIG__ = {
   appName: '${escapeJs(config.SITE_APP_NAME)}',
   myName: '${escapeJs(config.SITE_MY_NAME)}',
   role: '${escapeJs(config.SITE_ROLE)}',
-  summary: '${escapeJs(config.SITE_SUMMARY)}',
   location: '${escapeJs(config.SITE_LOCATION)}',
   availability: '${escapeJs(config.SITE_AVAILABILITY)}',
   publicUrl: '${escapeJs(config.SITE_PUBLIC_URL)}',
@@ -64,8 +60,6 @@ const configJs = `window.__APP_CONFIG__ = {
   resumeEmbedUrl: '${escapeJs(resumeEmbedUrl)}',
   resumeDownloadUrl: '${escapeJs(resumeDownloadUrl)}',
   resumePdfFileName: '${escapeJs(config.RESUME_PDF_FILE_NAME)}',
-  note1: '${escapeJs(config.SITE_NOTE_1)}',
-  note2: '${escapeJs(config.SITE_NOTE_2)}',
 }
 `
 

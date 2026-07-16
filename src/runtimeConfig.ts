@@ -2,7 +2,6 @@ export type RuntimeConfig = {
   appName: string
   myName: string
   role: string
-  summary: string
   location: string
   availability: string
   publicUrl: string
@@ -10,8 +9,6 @@ export type RuntimeConfig = {
   resumeEmbedUrl: string
   resumeDownloadUrl: string
   resumePdfFileName: string
-  note1: string
-  note2: string
 }
 
 declare global {
@@ -35,7 +32,6 @@ export const runtimeConfig: RuntimeConfig = {
   appName: getString(window.__APP_CONFIG__?.appName, 'Website'),
   myName: getString(window.__APP_CONFIG__?.myName, 'Your Name'),
   role: getString(window.__APP_CONFIG__?.role, 'Professional'),
-  summary: getString(window.__APP_CONFIG__?.summary),
   location: getString(window.__APP_CONFIG__?.location),
   availability: getString(window.__APP_CONFIG__?.availability),
   publicUrl: getString(window.__APP_CONFIG__?.publicUrl),
@@ -43,6 +39,4 @@ export const runtimeConfig: RuntimeConfig = {
   resumeEmbedUrl: getString(window.__APP_CONFIG__?.resumeEmbedUrl),
   resumeDownloadUrl: getString(window.__APP_CONFIG__?.resumeDownloadUrl),
   resumePdfFileName: getString(window.__APP_CONFIG__?.resumePdfFileName, 'Kevin_Saravia_Resume.pdf'),
-  note1: getString(window.__APP_CONFIG__?.note1),
-  note2: getString(window.__APP_CONFIG__?.note2),
 }

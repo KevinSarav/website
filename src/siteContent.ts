@@ -1,13 +1,14 @@
 import { runtimeConfig } from './runtimeConfig'
+import { profileContent } from './profileContent'
 
 export const siteContent = {
   appName: runtimeConfig.appName,
   name: runtimeConfig.myName,
   role: runtimeConfig.role,
-  summary: runtimeConfig.summary,
+  summary: profileContent.summary,
   location: runtimeConfig.location,
   availability: runtimeConfig.availability,
-  notes: [runtimeConfig.note1, runtimeConfig.note2].filter((note) => note.length > 0),
+  notes: profileContent.notes,
   resume: {
     openUrl:
       runtimeConfig.resumeOpenUrl || runtimeConfig.resumeEmbedUrl || runtimeConfig.resumeDownloadUrl,
