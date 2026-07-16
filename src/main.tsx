@@ -5,7 +5,7 @@ import './styles.css'
 
 document.title = siteContent.appName
 
-const metaItems = [siteContent.role, siteContent.location, siteContent.availability].filter(
+const metaItems = [siteContent.location, siteContent.availability].filter(
   (value) => value.length > 0,
 )
 
@@ -29,7 +29,7 @@ createRoot(document.getElementById('root')!).render(
 
       <section className="content-grid" aria-label="Professional overview">
         <div className="info-card">
-          <p className="card-label">Notes</p>
+          <p className="card-label">Highlights</p>
           {siteContent.notes.length > 0 ? (
             <div className="note-list">
               {siteContent.notes.map((note, index) => (
