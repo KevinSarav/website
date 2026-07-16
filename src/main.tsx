@@ -30,9 +30,9 @@ createRoot(document.getElementById('root')!).render(
       <section className="content-grid" aria-label="Professional overview">
         <div className="info-card">
           <p className="card-label">Highlights</p>
-          {siteContent.notes.length > 0 ? (
+          {siteContent.highlights.length > 0 ? (
             <div className="note-list">
-              {siteContent.notes.map((note, index) => (
+              {siteContent.highlights.map((note, index) => (
                 <p key={`${note}-${index}`}>{note}</p>
               ))}
             </div>

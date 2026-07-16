@@ -8,7 +8,7 @@ export const siteContent = {
   summary: profileContent.summary,
   location: runtimeConfig.location,
   availability: runtimeConfig.availability,
-  notes: profileContent.notes,
+  highlights: profileContent.highlights,
   resume: {
     openUrl:
       runtimeConfig.resumeOpenUrl || runtimeConfig.resumeEmbedUrl || runtimeConfig.resumeDownloadUrl,
