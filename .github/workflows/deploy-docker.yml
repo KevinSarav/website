@@ -26,8 +26,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set build environment
-        run: echo "SITE_PUBLIC_URL=kevin-saravia.shares.zrok.io" >> $GITHUB_ENV
+      - name: Resolve build environment
+        shell: bash
+        env:
+          SITE_PUBLIC_URL_VAR: ${{ vars.SITE_PUBLIC_URL_DOCKER }}
+          SITE_PUBLIC_URL_SECRET: ${{ secrets.SITE_PUBLIC_URL_DOCKER }}
+        run: |
+          set -euo pipefail
+
+          resolved_url=""
+          if [[ -n "${SITE_PUBLIC_URL_VAR:-}" ]]; then
+            resolved_url="${SITE_PUBLIC_URL_VAR}"
+          elif [[ -n "${SITE_PUBLIC_URL_SECRET:-}" ]]; then
+            resolved_url="${SITE_PUBLIC_URL_SECRET}"
+          elif [[ -f CNAME ]]; then
+            resolved_url="$(head -n 1 CNAME | tr -d '[:space:]')"
+          else
+            echo "::error title=Missing SITE_PUBLIC_URL_DOCKER::Set vars.SITE_PUBLIC_URL_DOCKER or secrets.SITE_PUBLIC_URL_DOCKER (or add CNAME)."
+            exit 1
+          fi
+
+          echo "SITE_PUBLIC_URL=$resolved_url" >> "$GITHUB_ENV"
+          echo "VITE_BASE_PATH=/" >> "$GITHUB_ENV"
+          echo "Resolved SITE_PUBLIC_URL=$resolved_url"
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -53,6 +74,7 @@ jobs:
           push: true
           build-args: |
             SITE_PUBLIC_URL=${{ env.SITE_PUBLIC_URL }}
+            VITE_BASE_PATH=${{ env.VITE_BASE_PATH }}
           tags: |
             ${{ steps.images.outputs.website_image }}
             ghcr.io/${{ steps.images.outputs.image_owner }}/website:${{ github.sha }}

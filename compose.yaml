@@ -1,6 +1,6 @@
 services:
   website:
-    image: ${WEBSITE_IMAGE}
+    image: ${WEBSITE_IMAGE:-website:local}
     build:
       context: .
     environment:

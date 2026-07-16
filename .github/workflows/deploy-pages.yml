@@ -32,11 +32,44 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Resolve deployment URL and base path
+        shell: bash
+        env:
+          SITE_PUBLIC_URL_OVERRIDE: ${{ vars.SITE_PUBLIC_URL_PAGES }}
+        run: |
+          set -euo pipefail
+
+          repo_name="${GITHUB_REPOSITORY#*/}"
+          repo_owner_lc="${GITHUB_REPOSITORY_OWNER,,}"
+          resolved_url=""
+          resolved_base=""
+
+          if [[ -n "${SITE_PUBLIC_URL_OVERRIDE:-}" ]]; then
+            resolved_url="${SITE_PUBLIC_URL_OVERRIDE}"
+            resolved_base="/"
+          elif [[ -f CNAME ]]; then
+            resolved_url="$(head -n 1 CNAME | tr -d '[:space:]')"
+            resolved_base="/"
+          else
+            resolved_url="${repo_owner_lc}.github.io/${repo_name}"
+            resolved_base="/${repo_name}/"
+          fi
+
+          echo "SITE_PUBLIC_URL=$resolved_url" >> "$GITHUB_ENV"
+          echo "VITE_BASE_PATH=$resolved_base" >> "$GITHUB_ENV"
+
+          echo "Resolved SITE_PUBLIC_URL=$resolved_url"
+          echo "Resolved VITE_BASE_PATH=$resolved_base"
+
       - name: Generate runtime config
         run: node scripts/generate-runtime-config.js
 
       - name: Build
-        run: SITE_PUBLIC_URL=kevin-saravia.com npm run build
+        run: npm run build
+
+      - name: Copy CNAME into build output
+        if: hashFiles('CNAME') != ''
+        run: cp CNAME dist/CNAME
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

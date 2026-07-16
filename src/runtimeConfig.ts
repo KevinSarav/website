@@ -22,7 +22,11 @@ function getString(value: unknown, fallback = '') {
   if (typeof value !== 'string') {
     return fallback
   }
-  return value.trim()
+  const normalized = value.trim()
+  if (!normalized || normalized === 'REPLACE_ME') {
+    return fallback
+  }
+  return normalized
 }
 
 export const runtimeConfig: RuntimeConfig = {

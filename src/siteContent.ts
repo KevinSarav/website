@@ -7,10 +7,7 @@ export const siteContent = {
   summary: runtimeConfig.summary,
   location: runtimeConfig.location,
   availability: runtimeConfig.availability,
-  notes: [
-    runtimeConfig.note1,
-    runtimeConfig.note2,
-  ],
+  notes: [runtimeConfig.note1, runtimeConfig.note2].filter((note) => note.length > 0),
   resume: {
     embedUrl: runtimeConfig.resumeEmbedUrl,
     downloadUrl: runtimeConfig.resumeDownloadUrl,

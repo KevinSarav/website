@@ -18,7 +18,7 @@ Site runs on `http://localhost:5173` with `SITE_PUBLIC_URL=http://localhost:5173
 Configuration in `.env` (committed to repo):
 - `SITE_APP_NAME`, `SITE_MY_NAME`, `SITE_ROLE`, etc. — portfolio content
 - `SITE_GDOC_RESUME_ID` — the Google Docs document ID (format: `https://docs.google.com/document/d/{ID}/...`). Share the doc as "Anyone with the link can view".
-- `SITE_PUBLIC_URL` — local development default; overridden by deployment workflows
+- `SITE_PUBLIC_URL` — optional for local development; deployment workflows now set this per target
 
 ### Option 1: Web Hosting (Recommended)
 
@@ -29,6 +29,11 @@ Deploy to a web hosting service like Cloudflare Pages, GitHub Pages, Netlify, et
 3. Set output directory: `dist`
 4. Platform handles DNS, SSL, CDN automatically
 5. Deploys on every push to `main`
+
+GitHub Pages workflow behavior:
+- Resolves `SITE_PUBLIC_URL` using `vars.SITE_PUBLIC_URL_PAGES`, otherwise `CNAME`, otherwise `{owner}.github.io/{repo}`.
+- Resolves `VITE_BASE_PATH` as `/` for custom-domain deploys and `/{repo}/` for project-page deploys.
+- Generates `public/runtime-config.js` using the resolved deployment URL (not localhost).
 
 This is the simplest option — no server to manage.
 
@@ -52,8 +57,13 @@ Run the site as a Docker container on your own hardware:
    - `DEPLOY_PATH` — path to clone repo on server
    - `DEPLOY_SSH_PRIVATE_KEY` — private SSH key for authentication
 
+Docker workflow behavior:
+- Resolves `SITE_PUBLIC_URL` using `vars.SITE_PUBLIC_URL_DOCKER` first, then `secrets.SITE_PUBLIC_URL_DOCKER`, then `CNAME`.
+- Fails fast if no production URL can be resolved.
+- Passes `SITE_PUBLIC_URL` into image build and runtime config generation.
+
 ### Environment Variables Per Deployment
 
-- **Local dev**: `SITE_PUBLIC_URL=http://localhost:5173`
-- **Web hosting** (e.g., Cloudflare): `SITE_PUBLIC_URL=domain.com` (set in workflow)
-- **Docker self-hosted**: `SITE_PUBLIC_URL=domain.com` (set in workflow)
+- **Local dev**: optional `SITE_PUBLIC_URL=http://localhost:5173`
+- **GitHub Pages**: set `vars.SITE_PUBLIC_URL_PAGES` (or keep `CNAME` in repo)
+- **Docker self-hosted**: set `vars.SITE_PUBLIC_URL_DOCKER` (or `secrets.SITE_PUBLIC_URL_DOCKER`)

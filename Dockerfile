@@ -1,11 +1,12 @@
 FROM node:22-alpine AS build
-ARG SITE_PUBLIC_URL=http://localhost:5173
+ARG SITE_PUBLIC_URL=
+ARG VITE_BASE_PATH=/
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
 COPY . .
 RUN node scripts/generate-runtime-config.js
-RUN SITE_PUBLIC_URL=${SITE_PUBLIC_URL} npm run build
+RUN SITE_PUBLIC_URL=${SITE_PUBLIC_URL} VITE_BASE_PATH=${VITE_BASE_PATH} npm run build
 
 FROM nginx:1.29-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf

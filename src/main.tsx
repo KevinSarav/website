@@ -64,6 +64,10 @@ async function handleResumeDownloadClick() {
 
 document.title = siteContent.appName
 
+const metaItems = [siteContent.role, siteContent.location, siteContent.availability].filter(
+  (value) => value.length > 0,
+)
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <main className="page-shell">
@@ -71,23 +75,31 @@ createRoot(document.getElementById('root')!).render(
         <div className="hero-copy">
           <p className="eyebrow">{siteContent.role}</p>
           <h1>{siteContent.name}</h1>
-          <p className="lede">{siteContent.summary}</p>
-          <div className="meta-row">
-            <span>{siteContent.role}</span>
-            <span>{siteContent.location}</span>
-            <span>{siteContent.availability}</span>
-          </div>
+          {siteContent.summary.length > 0 ? <p className="lede">{siteContent.summary}</p> : null}
+          {metaItems.length > 0 ? (
+            <div className="meta-row">
+              {metaItems.map((item, index) => (
+                <span key={`${item}-${index}`}>{item}</span>
+              ))}
+            </div>
+          ) : null}
         </div>
       </section>
 
       <section className="content-grid" aria-label="Professional overview">
         <div className="info-card">
           <p className="card-label">Notes</p>
-          <div className="note-list">
-            {siteContent.notes.map((note) => (
-              <p key={note}>{note}</p>
-            ))}
-          </div>
+          {siteContent.notes.length > 0 ? (
+            <div className="note-list">
+              {siteContent.notes.map((note, index) => (
+                <p key={`${note}-${index}`}>{note}</p>
+              ))}
+            </div>
+          ) : (
+            <div className="note-list">
+              <p>Add a couple of personal notes in your environment config to show this section.</p>
+            </div>
+          )}
         </div>
       </section>
 
