@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate runtime config
+        run: node scripts/generate-runtime-config.js
+
       - name: Build
         run: SITE_PUBLIC_URL=kevin-saravia.com npm run build
 
