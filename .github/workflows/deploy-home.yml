@@ -150,15 +150,6 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
-      - name: Pull latest main and deploy on server
-        shell: bash
-        env:
-          DEPLOY_BRANCH: ${{ github.ref_name }}
-        run: |
-          set -euo pipefail
-
-          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' PROFILE_CITY='${PROFILE_CITY:-}' PROFILE_REGION='${PROFILE_REGION:-}' PROFILE_COUNTRY='${PROFILE_COUNTRY:-}' bash '$DEPLOY_PATH/scripts/deploy-selfhost.sh'"
-
       - name: Detect self-host geolocation
         id: detect_geo
         shell: bash
@@ -299,7 +290,45 @@ jobs:
           echo "Updated profile location to: $NEW_CITY, $NEW_REGION, $NEW_COUNTRY"
           echo "sync_performed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Trigger Pages redeploy
+      - name: Resolve effective profile location for self-host deploy
+        id: deploy_profile
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW_CITY: ${{ steps.detect_geo.outputs.city }}
+          NEW_REGION: ${{ steps.detect_geo.outputs.region }}
+          NEW_COUNTRY: ${{ steps.detect_geo.outputs.country }}
+        run: |
+          set -euo pipefail
+
+          repo="$GITHUB_REPOSITORY"
+          city="${NEW_CITY:-}"
+          region="${NEW_REGION:-}"
+          country="${NEW_COUNTRY:-}"
+
+          if [[ -z "$city" || -z "$region" || -z "$country" ]]; then
+            city="$(gh api "repos/$repo/actions/variables/PROFILE_CITY" --jq '.value' 2>/dev/null || true)"
+            region="$(gh api "repos/$repo/actions/variables/PROFILE_REGION" --jq '.value' 2>/dev/null || true)"
+            country="$(gh api "repos/$repo/actions/variables/PROFILE_COUNTRY" --jq '.value' 2>/dev/null || true)"
+          fi
+
+          echo "city=$city" >> "$GITHUB_OUTPUT"
+          echo "region=$region" >> "$GITHUB_OUTPUT"
+          echo "country=$country" >> "$GITHUB_OUTPUT"
+
+      - name: Pull latest main and deploy on server
+        shell: bash
+        env:
+          DEPLOY_BRANCH: ${{ github.ref_name }}
+          DEPLOY_CITY: ${{ steps.deploy_profile.outputs.city }}
+          DEPLOY_REGION: ${{ steps.deploy_profile.outputs.region }}
+          DEPLOY_COUNTRY: ${{ steps.deploy_profile.outputs.country }}
+        run: |
+          set -euo pipefail
+
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' PROFILE_CITY='${DEPLOY_CITY:-}' PROFILE_REGION='${DEPLOY_REGION:-}' PROFILE_COUNTRY='${DEPLOY_COUNTRY:-}' bash '$DEPLOY_PATH/scripts/deploy-selfhost.sh'"
+
+      - name: Trigger remote deploy
         if: steps.compare_geo.outputs.location_changed == 'true' && steps.sync_geo.outputs.sync_performed == 'true'
         shell: bash
         env:
