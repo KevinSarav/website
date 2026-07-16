@@ -1,4 +1,4 @@
-name: Deploy Docker to Home Server
+name: Deploy to Home Server
 
 on:
   push:

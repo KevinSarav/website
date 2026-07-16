@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy to Remote Server
 
 on:
   push:
@@ -80,13 +80,13 @@ jobs:
           path: ./dist
 
   deploy:
-    name: Deploy to Pages
+    name: Deploy to server
     needs: build
     runs-on: ubuntu-latest
     environment:
       name: production-online
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy to server
         id: deployment
         uses: actions/deploy-pages@v4
