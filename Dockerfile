@@ -1,9 +1,10 @@
 FROM node:22-alpine AS build
+ARG SITE_PUBLIC_URL=http://localhost:5173
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
 COPY . .
-RUN npm run build
+RUN SITE_PUBLIC_URL=${SITE_PUBLIC_URL} npm run build
 
 FROM nginx:1.29-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf

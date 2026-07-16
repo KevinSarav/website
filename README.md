@@ -11,66 +11,49 @@ npm run dev
 
 Use `npm run build` if you want to verify the production frontend build locally.
 
-## Docker Deploy
+Site runs on `http://localhost:5173` with `SITE_PUBLIC_URL=http://localhost:5173` (from `.env`).
 
-1. Copy `.env.example` to `.env` and fill in production values.
-2. Review Docker Compose env interpolation meanings in the official docs: https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/
-3. Start or update the stack:
+## Deployment
 
-```bash
-docker compose up -d --build
-```
+Configuration in `.env` (committed to repo):
+- `SITE_APP_NAME`, `SITE_MY_NAME`, `SITE_ROLE`, etc. — portfolio content
+- `SITE_GDOC_RESUME_ID` — the Google Docs document ID (format: `https://docs.google.com/document/d/{ID}/...`). Share the doc as "Anyone with the link can view".
+- `SITE_PUBLIC_URL` — local development default; overridden by deployment workflows
 
-The stack also starts two internal services for dynamic resume PDF generation:
-- `gotenberg` for DOCX to PDF conversion.
-- `docx-converter` for serving `/api/resume.pdf`.
+### Option 1: Web Hosting (Recommended)
 
-`SITE_RESUME_DOWNLOAD_URL` is used as the source DOCX URL for both the `Open resume` button and server-side PDF conversion.
-Set `PDF_FILENAME` in `.env`/`.env.sops` to control the downloaded PDF file name.
+Deploy to a web hosting service like Cloudflare Pages, GitHub Pages, Netlify, etc.:
 
-Frontend content values are runtime env (`SITE_*`) now. You can change them in `.env/.env.sops` and redeploy without rebuilding images.
+1. Connect your GitHub repo to your hosting platform
+2. Set build command: `npm run build`
+3. Set output directory: `dist`
+4. Platform handles DNS, SSL, CDN automatically
+5. Deploys on every push to `main`
 
-## GitHub Packages (Private GHCR)
+This is the simplest option — no server to manage.
 
-This repo is configured to publish private container images on every push to `main`:
-- `ghcr.io/<owner>/website:latest`
-- `ghcr.io/<owner>/docx-converter:latest`
+### Option 2: Docker Self-Hosted (on your home machine)
 
-Deployment then pulls those images on the server instead of building them there.
+Run the site as a Docker container on your own hardware:
 
-`WEBSITE_IMAGE` and `DOCX_CONVERTER_IMAGE` are injected by GitHub Actions during deploy (from workflow outputs), not from server `.env`.
+1. Build and run locally:
+   ```bash
+   docker compose up -d --build
+   ```
 
-### Required GitHub configuration
+2. Access via public tunnel (e.g., zrok):
+   - Get free tunnel: `zrok invite`
+   - Start tunnel: `zrok share public http://localhost`
+   - Share the generated URL
 
-Set deployment Secrets:
-- `DEPLOY_USER`
-- `DEPLOY_HOST`
-- `DEPLOY_PORT` (optional, defaults to `22`)
-- `DEPLOY_PATH`
-- `DEPLOY_SSH_PRIVATE_KEY`
+3. For automated deployments via GitHub Actions, set secrets:
+   - `DEPLOY_USER` — SSH username on your server
+   - `DEPLOY_HOST` — hostname/IP of your server
+   - `DEPLOY_PATH` — path to clone repo on server
+   - `DEPLOY_SSH_PRIVATE_KEY` — private SSH key for authentication
 
-Optional (needed for private image pull auth from server):
-- `GHCR_USERNAME`
-- `GHCR_TOKEN` (PAT with `read:packages`)
+### Environment Variables Per Deployment
 
-Optional (only needed if cleanup cannot delete versions with `GITHUB_TOKEN`):
-- `GHCR_CLEANUP_TOKEN` (classic PAT with `delete:packages`)
-
-### Cleanup policy
-
-Cleanup runs as part of deploy workflow `.github/workflows/deploy-website.yml`. After a successful deploy, GitHub keeps only the newest 3 versions for each container package (`website` and `docx-converter`) and deletes older versions.
-
-## Encrypt `.env` to `.env.sops` (Manual)
-
-Use SOPS locally whenever `.env` changes:
-
-```bash
-sops --encrypt --input-type dotenv --output-type dotenv .env > .env.sops
-chmod 600 .env.sops
-```
-
-If you rotate or add Age keys, update recipients in `.sops.yaml` under `creation_rules[].age`, then re-encrypt:
-
-```bash
-sops updatekeys .env.sops
-```
+- **Local dev**: `SITE_PUBLIC_URL=http://localhost:5173`
+- **Web hosting** (e.g., Cloudflare): `SITE_PUBLIC_URL=domain.com` (set in workflow)
+- **Docker self-hosted**: `SITE_PUBLIC_URL=domain.com` (set in workflow)
