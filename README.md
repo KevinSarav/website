@@ -79,4 +79,4 @@ Docker workflow behavior:
 - **Local dev**: optional `SITE_PUBLIC_URL=http://localhost:5173`
 - **Online hosting environment (`production-online`)**: set `vars.SITE_PUBLIC_URL` (or keep `CNAME` in repo)
 - **Self-hosted environment (`production-selfhost`)**: set `vars.SITE_PUBLIC_URL` (or `secrets.SITE_PUBLIC_URL`)
-- **Resume ID**: set `SITE_GDOC_RESUME_ID` in `.env` (and in `.env.sops` for server deployments)
+- **Resume ID**: set `SITE_GDOC_RESUME_ID` in `.env`
