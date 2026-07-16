@@ -227,16 +227,14 @@ jobs:
 
           repo="$GITHUB_REPOSITORY"
 
-          get_env_var_value() {
-            local env_name="$1"
-            local key="$2"
-            gh api "repos/$repo/environments/$env_name/variables" \
-              --jq ".variables[]? | select(.name == \"$key\") | .value" 2>/dev/null || true
+          get_repo_var_value() {
+            local key="$1"
+            gh api "repos/$repo/actions/variables/$key" --jq '.value' 2>/dev/null || true
           }
 
-          current_city="$(get_env_var_value production-online PROFILE_CITY)"
-          current_region="$(get_env_var_value production-online PROFILE_REGION)"
-          current_country="$(get_env_var_value production-online PROFILE_COUNTRY)"
+          current_city="$(get_repo_var_value PROFILE_CITY)"
+          current_region="$(get_repo_var_value PROFILE_REGION)"
+          current_country="$(get_repo_var_value PROFILE_COUNTRY)"
 
           if [[ "$NEW_CITY" == "$current_city" && "$NEW_REGION" == "$current_region" && "$NEW_COUNTRY" == "$current_country" ]]; then
             echo "Profile location unchanged."
@@ -259,7 +257,7 @@ jobs:
           set -euo pipefail
 
           if [[ -z "${GH_TOKEN:-}" ]]; then
-            echo "::warning title=Location sync skipped::Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Environments: write on this repo)."
+            echo "::warning title=Location sync skipped::Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Variables: write on this repo)."
             echo "sync_performed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -268,37 +266,35 @@ jobs:
           err_log="$(mktemp)"
           trap 'rm -f "$err_log"' EXIT
 
-          for env_name in production-online production-selfhost; do
-            if ! gh variable set PROFILE_CITY --env "$env_name" --repo "$repo" --body "$NEW_CITY" 2>"$err_log"; then
-              if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
-                echo "::warning title=Location sync skipped::Token cannot write environment variables. Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Environments: write on this repo)."
-                echo "sync_performed=false" >> "$GITHUB_OUTPUT"
-                exit 0
-              fi
-              cat "$err_log"
-              exit 1
+          if ! gh variable set PROFILE_CITY --repo "$repo" --body "$NEW_CITY" 2>"$err_log"; then
+            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
+              echo "::warning title=Location sync skipped::Token cannot write repository variables. Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Variables: write on this repo)."
+              echo "sync_performed=false" >> "$GITHUB_OUTPUT"
+              exit 0
             fi
+            cat "$err_log"
+            exit 1
+          fi
 
-            if ! gh variable set PROFILE_REGION --env "$env_name" --repo "$repo" --body "$NEW_REGION" 2>"$err_log"; then
-              if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
-                echo "::warning title=Location sync skipped::Token cannot write environment variables. Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Environments: write on this repo)."
-                echo "sync_performed=false" >> "$GITHUB_OUTPUT"
-                exit 0
-              fi
-              cat "$err_log"
-              exit 1
+          if ! gh variable set PROFILE_REGION --repo "$repo" --body "$NEW_REGION" 2>"$err_log"; then
+            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
+              echo "::warning title=Location sync skipped::Token cannot write repository variables. Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Variables: write on this repo)."
+              echo "sync_performed=false" >> "$GITHUB_OUTPUT"
+              exit 0
             fi
+            cat "$err_log"
+            exit 1
+          fi
 
-            if ! gh variable set PROFILE_COUNTRY --env "$env_name" --repo "$repo" --body "$NEW_COUNTRY" 2>"$err_log"; then
-              if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
-                echo "::warning title=Location sync skipped::Token cannot write environment variables. Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Environments: write on this repo)."
-                echo "sync_performed=false" >> "$GITHUB_OUTPUT"
-                exit 0
-              fi
-              cat "$err_log"
-              exit 1
+          if ! gh variable set PROFILE_COUNTRY --repo "$repo" --body "$NEW_COUNTRY" 2>"$err_log"; then
+            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
+              echo "::warning title=Location sync skipped::Token cannot write repository variables. Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Variables: write on this repo)."
+              echo "sync_performed=false" >> "$GITHUB_OUTPUT"
+              exit 0
             fi
-          done
+            cat "$err_log"
+            exit 1
+          fi
 
           echo "Updated profile location to: $NEW_CITY, $NEW_REGION, $NEW_COUNTRY"
           echo "sync_performed=true" >> "$GITHUB_OUTPUT"
