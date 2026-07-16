@@ -220,19 +220,46 @@ jobs:
 
           get_repo_var_value() {
             local key="$1"
-            gh api "repos/$repo/actions/variables/$key" --jq '.value' 2>/dev/null || true
+            gh api "repos/$repo/actions/variables/$key" --jq '.value'
           }
 
-          current_city="$(get_repo_var_value PROFILE_CITY)"
-          current_region="$(get_repo_var_value PROFILE_REGION)"
-          current_country="$(get_repo_var_value PROFILE_COUNTRY)"
+          normalize_value() {
+            # Trim, collapse repeated spaces, and compare case-insensitively.
+            printf '%s' "$1" \
+              | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/[[:space:]]\+/ /g' \
+              | tr '[:upper:]' '[:lower:]'
+          }
 
-          if [[ "$NEW_CITY" == "$current_city" && "$NEW_REGION" == "$current_region" && "$NEW_COUNTRY" == "$current_country" ]]; then
+          if ! current_city="$(get_repo_var_value PROFILE_CITY 2>/dev/null)"; then
+            echo "Could not read PROFILE_CITY from repo variables. Skipping profile location sync."
+            echo "location_changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! current_region="$(get_repo_var_value PROFILE_REGION 2>/dev/null)"; then
+            echo "Could not read PROFILE_REGION from repo variables. Skipping profile location sync."
+            echo "location_changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! current_country="$(get_repo_var_value PROFILE_COUNTRY 2>/dev/null)"; then
+            echo "Could not read PROFILE_COUNTRY from repo variables. Skipping profile location sync."
+            echo "location_changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          }
+
+          new_city_normalized="$(normalize_value "$NEW_CITY")"
+          new_region_normalized="$(normalize_value "$NEW_REGION")"
+          new_country_normalized="$(normalize_value "$NEW_COUNTRY")"
+          current_city_normalized="$(normalize_value "$current_city")"
+          current_region_normalized="$(normalize_value "$current_region")"
+          current_country_normalized="$(normalize_value "$current_country")"
+
+          if [[ "$new_city_normalized" == "$current_city_normalized" && "$new_region_normalized" == "$current_region_normalized" && "$new_country_normalized" == "$current_country_normalized" ]]; then
             echo "Profile location unchanged."
             echo "location_changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
+          echo "Location changed: '$current_city, $current_region, $current_country' -> '$NEW_CITY, $NEW_REGION, $NEW_COUNTRY'"
           echo "location_changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Sync profile location vars
