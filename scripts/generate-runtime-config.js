@@ -66,6 +66,13 @@ const configJs = `window.__APP_CONFIG__ = {
 
 // Write to public/runtime-config.js
 const outputPath = path.join(__dirname, '..', 'public', 'runtime-config.js')
+const outputDir = path.dirname(outputPath)
+
+// Create directory if it doesn't exist
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true })
+}
+
 fs.writeFileSync(outputPath, configJs)
 console.log(`✓ Generated ${outputPath}`)
 
