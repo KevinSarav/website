@@ -3,21 +3,33 @@ import { createRoot } from 'react-dom/client'
 import { hasResume, siteContent } from './siteContent'
 import './styles.css'
 
-function handleResumeDownloadClick() {
-  if (siteContent.resume.downloadUrl.length > 0) {
-    const openedWindow = window.open(siteContent.resume.downloadUrl, '_blank', 'noopener,noreferrer')
-    if (openedWindow) {
-      openedWindow.opener = null
-      return
-    }
+let isOpeningResumePdf = false
 
-    const link = document.createElement('a')
-    link.href = siteContent.resume.downloadUrl
-    link.download = siteContent.resume.pdfFileName
-    link.rel = 'noopener noreferrer'
+function handleResumeDownloadClick() {
+  if (siteContent.resume.downloadUrl.length === 0 || isOpeningResumePdf) {
+    return
+  }
+
+  isOpeningResumePdf = true
+
+  const link = document.createElement('a')
+  link.href = siteContent.resume.downloadUrl
+  link.target = '_blank'
+  link.rel = 'noopener noreferrer'
+
+  try {
     document.body.appendChild(link)
     link.click()
+  } catch {
+    // Fallback path for strict popup environments.
+    link.target = ''
+    link.download = siteContent.resume.pdfFileName
+    link.click()
+  } finally {
     link.remove()
+    window.setTimeout(() => {
+      isOpeningResumePdf = false
+    }, 300)
   }
 }
 
