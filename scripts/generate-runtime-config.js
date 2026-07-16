@@ -6,9 +6,17 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Read .env file
+// Read .env file if it exists, otherwise use empty string
 const envPath = path.join(__dirname, '..', '.env')
-const envContent = fs.readFileSync(envPath, 'utf-8')
+let envContent = ''
+try {
+  envContent = fs.readFileSync(envPath, 'utf-8')
+} catch (err) {
+  if (err.code !== 'ENOENT') {
+    throw err
+  }
+  // File doesn't exist, that's ok
+}
 
 // Parse .env
 const env = {}
@@ -20,25 +28,39 @@ envContent.split('\n').forEach(line => {
   }
 })
 
+// Merge with process.env (environment variables take precedence)
+const config = {
+  SITE_APP_NAME: process.env.SITE_APP_NAME || env.SITE_APP_NAME || 'Website',
+  SITE_MY_NAME: process.env.SITE_MY_NAME || env.SITE_MY_NAME || 'REPLACE_ME',
+  SITE_ROLE: process.env.SITE_ROLE || env.SITE_ROLE || 'REPLACE_ME',
+  SITE_SUMMARY: process.env.SITE_SUMMARY || env.SITE_SUMMARY || 'REPLACE_ME',
+  SITE_LOCATION: process.env.SITE_LOCATION || env.SITE_LOCATION || 'REPLACE_ME',
+  SITE_AVAILABILITY: process.env.SITE_AVAILABILITY || env.SITE_AVAILABILITY || 'REPLACE_ME',
+  SITE_PUBLIC_URL: process.env.SITE_PUBLIC_URL || env.SITE_PUBLIC_URL || '',
+  SITE_GDOC_RESUME_ID: process.env.SITE_GDOC_RESUME_ID || env.SITE_GDOC_RESUME_ID || '',
+  SITE_NOTE_1: process.env.SITE_NOTE_1 || env.SITE_NOTE_1 || 'REPLACE_ME',
+  SITE_NOTE_2: process.env.SITE_NOTE_2 || env.SITE_NOTE_2 || 'REPLACE_ME',
+}
+
 // Extract and compute resume URLs
-const gdocResumeId = env.SITE_GDOC_RESUME_ID || ''
+const gdocResumeId = config.SITE_GDOC_RESUME_ID
 const gdocBase = gdocResumeId ? `https://docs.google.com/document/d/${gdocResumeId}` : ''
 const resumeEmbedUrl = gdocBase ? `${gdocBase}/preview` : ''
 const resumeDownloadUrl = gdocBase ? `${gdocBase}/export?format=pdf` : ''
 
 // Generate runtime-config.js
 const configJs = `window.__APP_CONFIG__ = {
-  appName: '${escapeJs(env.SITE_APP_NAME || 'Website')}',
-  myName: '${escapeJs(env.SITE_MY_NAME || 'REPLACE_ME')}',
-  role: '${escapeJs(env.SITE_ROLE || 'REPLACE_ME')}',
-  summary: '${escapeJs(env.SITE_SUMMARY || 'REPLACE_ME')}',
-  location: '${escapeJs(env.SITE_LOCATION || 'REPLACE_ME')}',
-  availability: '${escapeJs(env.SITE_AVAILABILITY || 'REPLACE_ME')}',
-  publicUrl: '${escapeJs(env.SITE_PUBLIC_URL || '')}',
+  appName: '${escapeJs(config.SITE_APP_NAME)}',
+  myName: '${escapeJs(config.SITE_MY_NAME)}',
+  role: '${escapeJs(config.SITE_ROLE)}',
+  summary: '${escapeJs(config.SITE_SUMMARY)}',
+  location: '${escapeJs(config.SITE_LOCATION)}',
+  availability: '${escapeJs(config.SITE_AVAILABILITY)}',
+  publicUrl: '${escapeJs(config.SITE_PUBLIC_URL)}',
   resumeEmbedUrl: '${escapeJs(resumeEmbedUrl)}',
   resumeDownloadUrl: '${escapeJs(resumeDownloadUrl)}',
-  note1: '${escapeJs(env.SITE_NOTE_1 || 'REPLACE_ME')}',
-  note2: '${escapeJs(env.SITE_NOTE_2 || 'REPLACE_ME')}',
+  note1: '${escapeJs(config.SITE_NOTE_1)}',
+  note2: '${escapeJs(config.SITE_NOTE_2)}',
 }
 `
 
