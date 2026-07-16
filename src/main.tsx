@@ -3,68 +3,15 @@ import { createRoot } from 'react-dom/client'
 import { hasResume, siteContent } from './siteContent'
 import './styles.css'
 
-function getDownloadFilename(contentDisposition: string | null) {
-  if (!contentDisposition) {
-    return 'resume.pdf'
-  }
-
-  const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i)
-  if (utf8Match?.[1]) {
-    try {
-      return decodeURIComponent(utf8Match[1])
-    } catch {
-      return 'resume.pdf'
-    }
-  }
-
-  const quotedMatch = contentDisposition.match(/filename="([^"]+)"/i)
-  if (quotedMatch?.[1]) {
-    return quotedMatch[1]
-  }
-
-  const plainMatch = contentDisposition.match(/filename=([^;\s]+)/i)
-  if (plainMatch?.[1]) {
-    return plainMatch[1]
-  }
-
-  return 'resume.pdf'
-}
-
-async function downloadResumePdf() {
-  const response = await fetch('/api/resume.pdf', {
-    method: 'GET',
-    credentials: 'same-origin',
-  })
-
-  if (!response.ok) {
-    throw new Error(`Resume download failed (${response.status})`)
-  }
-
-  const blob = await response.blob()
-  const objectUrl = URL.createObjectURL(blob)
-  const filename = getDownloadFilename(response.headers.get('Content-Disposition'))
-  const link = document.createElement('a')
-  link.href = objectUrl
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  URL.revokeObjectURL(objectUrl)
-}
-
-async function handleResumeDownloadClick() {
-  try {
-    await downloadResumePdf()
-  } catch {
-    if (siteContent.resume.downloadUrl.length > 0) {
-      const link = document.createElement('a')
-      link.href = siteContent.resume.downloadUrl
-      link.download = 'resume.pdf'
-      link.rel = 'noopener noreferrer'
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-    }
+function handleResumeDownloadClick() {
+  if (siteContent.resume.downloadUrl.length > 0) {
+    const link = document.createElement('a')
+    link.href = siteContent.resume.downloadUrl
+    link.download = 'resume.pdf'
+    link.rel = 'noopener noreferrer'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
   }
 }
 
@@ -131,9 +78,7 @@ createRoot(document.getElementById('root')!).render(
                 <button
                   type="button"
                   className="secondary-button"
-                  onClick={() => {
-                    void handleResumeDownloadClick()
-                  }}
+                  onClick={handleResumeDownloadClick}
                 >
                   Download PDF
                 </button>
@@ -150,7 +95,7 @@ createRoot(document.getElementById('root')!).render(
                 loading="lazy"
               />
               {siteContent.resume.downloadUrl.length > 0 ? (
-                <p className="resume-help">If preview is unavailable, open the DOCX or download the PDF.</p>
+                <p className="resume-help">If preview is unavailable, open the Google Doc or download the PDF.</p>
               ) : null}
             </>
           ) : (

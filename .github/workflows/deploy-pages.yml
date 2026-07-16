@@ -35,9 +35,7 @@ jobs:
       - name: Resolve deployment URL and base path
         shell: bash
         env:
-          SITE_PUBLIC_URL_OVERRIDE: ${{ vars.SITE_PUBLIC_URL_PAGES }}
-          SITE_GDOC_RESUME_ID_VAR: ${{ vars.SITE_GDOC_RESUME_ID }}
-          SITE_GDOC_RESUME_ID_SECRET: ${{ secrets.SITE_GDOC_RESUME_ID }}
+          SITE_PUBLIC_URL_OVERRIDE: ${{ vars.SITE_PUBLIC_URL }}
         run: |
           set -euo pipefail
 
@@ -59,12 +57,6 @@ jobs:
 
           echo "SITE_PUBLIC_URL=$resolved_url" >> "$GITHUB_ENV"
           echo "VITE_BASE_PATH=$resolved_base" >> "$GITHUB_ENV"
-
-          if [[ -n "${SITE_GDOC_RESUME_ID_VAR:-}" ]]; then
-            echo "SITE_GDOC_RESUME_ID=${SITE_GDOC_RESUME_ID_VAR}" >> "$GITHUB_ENV"
-          elif [[ -n "${SITE_GDOC_RESUME_ID_SECRET:-}" ]]; then
-            echo "SITE_GDOC_RESUME_ID=${SITE_GDOC_RESUME_ID_SECRET}" >> "$GITHUB_ENV"
-          fi
 
           echo "Resolved SITE_PUBLIC_URL=$resolved_url"
           echo "Resolved VITE_BASE_PATH=$resolved_base"
@@ -92,7 +84,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment:
-      name: github-pages
+      name: production-online
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages

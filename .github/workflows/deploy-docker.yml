@@ -14,7 +14,7 @@ jobs:
   build-and-publish:
     name: Build and publish images
     runs-on: ubuntu-latest
-    environment: production
+    environment: production-selfhost
     permissions:
       contents: read
       packages: write
@@ -29,8 +29,8 @@ jobs:
       - name: Resolve build environment
         shell: bash
         env:
-          SITE_PUBLIC_URL_VAR: ${{ vars.SITE_PUBLIC_URL_DOCKER }}
-          SITE_PUBLIC_URL_SECRET: ${{ secrets.SITE_PUBLIC_URL_DOCKER }}
+          SITE_PUBLIC_URL_VAR: ${{ vars.SITE_PUBLIC_URL }}
+          SITE_PUBLIC_URL_SECRET: ${{ secrets.SITE_PUBLIC_URL }}
         run: |
           set -euo pipefail
 
@@ -42,7 +42,7 @@ jobs:
           elif [[ -f CNAME ]]; then
             resolved_url="$(head -n 1 CNAME | tr -d '[:space:]')"
           else
-            echo "::error title=Missing SITE_PUBLIC_URL_DOCKER::Set vars.SITE_PUBLIC_URL_DOCKER or secrets.SITE_PUBLIC_URL_DOCKER (or add CNAME)."
+            echo "::error title=Missing SITE_PUBLIC_URL::Set vars.SITE_PUBLIC_URL or secrets.SITE_PUBLIC_URL (or add CNAME)."
             exit 1
           fi
 
@@ -87,7 +87,7 @@ jobs:
     needs:
       - build-and-publish
     runs-on: ubuntu-latest
-    environment: production
+    environment: production-selfhost
     env:
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -97,11 +97,6 @@ jobs:
       GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
       GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       WEBSITE_IMAGE: ${{ needs.build-and-publish.outputs.website_image }}
-      SITE_GDOC_RESUME_ID_VAR: ${{ vars.SITE_GDOC_RESUME_ID }}
-      SITE_GDOC_RESUME_ID_SECRET: ${{ secrets.SITE_GDOC_RESUME_ID }}
-      SITE_RESUME_OPEN_URL_VAR: ${{ vars.SITE_RESUME_OPEN_URL }}
-      SITE_RESUME_EMBED_URL_VAR: ${{ vars.SITE_RESUME_EMBED_URL }}
-      SITE_RESUME_DOWNLOAD_URL_VAR: ${{ vars.SITE_RESUME_DOWNLOAD_URL }}
 
     steps:
       - name: Checkout
@@ -155,38 +150,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          read_env_value() {
-            local key="$1"
-            if [[ ! -f .env ]]; then
-              return 0
-            fi
-            grep -E "^${key}=" .env | head -n 1 | cut -d '=' -f2- || true
-          }
-
-          resume_id="${SITE_GDOC_RESUME_ID_VAR:-}"
-          if [[ -z "$resume_id" && -n "${SITE_GDOC_RESUME_ID_SECRET:-}" ]]; then
-            resume_id="$SITE_GDOC_RESUME_ID_SECRET"
-          fi
-          if [[ -z "$resume_id" ]]; then
-            resume_id="$(read_env_value SITE_GDOC_RESUME_ID)"
-          fi
-
-          resume_open_url="${SITE_RESUME_OPEN_URL_VAR:-}"
-          if [[ -z "$resume_id" && -z "$resume_open_url" ]]; then
-            resume_open_url="$(read_env_value SITE_RESUME_OPEN_URL)"
-          fi
-
-          resume_embed_url="${SITE_RESUME_EMBED_URL_VAR:-}"
-          if [[ -z "$resume_id" && -z "$resume_embed_url" ]]; then
-            resume_embed_url="$(read_env_value SITE_RESUME_EMBED_URL)"
-          fi
-
-          resume_download_url="${SITE_RESUME_DOWNLOAD_URL_VAR:-}"
-          if [[ -z "$resume_id" && -z "$resume_download_url" ]]; then
-            resume_download_url="$(read_env_value SITE_RESUME_DOWNLOAD_URL)"
-          fi
-
-          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' SITE_GDOC_RESUME_ID='$resume_id' SITE_RESUME_OPEN_URL='$resume_open_url' SITE_RESUME_EMBED_URL='$resume_embed_url' SITE_RESUME_DOWNLOAD_URL='$resume_download_url' bash '$DEPLOY_PATH/scripts/deploy-remote.sh'"
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' bash '$DEPLOY_PATH/scripts/deploy-remote.sh'"
 
       - name: Cleanup old GHCR versions (keep 3)
         shell: bash

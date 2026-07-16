@@ -54,9 +54,6 @@ upsert_env() {
 }
 
 upsert_env "SITE_GDOC_RESUME_ID" "${SITE_GDOC_RESUME_ID:-}"
-upsert_env "SITE_RESUME_OPEN_URL" "${SITE_RESUME_OPEN_URL:-}"
-upsert_env "SITE_RESUME_EMBED_URL" "${SITE_RESUME_EMBED_URL:-}"
-upsert_env "SITE_RESUME_DOWNLOAD_URL" "${SITE_RESUME_DOWNLOAD_URL:-}"
 
 if [[ -n "${GHCR_USERNAME:-}" || -n "${GHCR_TOKEN:-}" ]]; then
   if [[ -z "${GHCR_USERNAME:-}" || -z "${GHCR_TOKEN:-}" ]]; then
