@@ -69,6 +69,7 @@ Docker workflow behavior:
 - Passes `SITE_PUBLIC_URL` into image build and runtime config generation.
 - Uses `SITE_GDOC_RESUME_ID` from server runtime `.env`.
 - Detects geolocation from the self-host server IP, syncs `PROFILE_CITY`/`PROFILE_REGION`/`PROFILE_COUNTRY` env vars when changed, and triggers the remote workflow to keep online deployment in sync.
+- If the default `GITHUB_TOKEN` cannot write environment vars (HTTP 403), set secret `LOCATION_SYNC_TOKEN` with permissions to manage Actions variables and run workflows.
 
 ### Environment Variables Per Deployment
 
