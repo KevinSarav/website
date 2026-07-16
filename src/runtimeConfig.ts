@@ -1,7 +1,6 @@
 export type RuntimeConfig = {
   appName: string
   myName: string
-  role: string
   location: string
   publicUrl: string
   gdocSummaryId: string
@@ -32,7 +31,6 @@ function getString(value: unknown, fallback = '') {
 export const runtimeConfig: RuntimeConfig = {
   appName: getString(window.__APP_CONFIG__?.appName, 'Website'),
   myName: getString(window.__APP_CONFIG__?.myName, 'Your Name'),
-  role: getString(window.__APP_CONFIG__?.role, 'Professional'),
   location: getString(window.__APP_CONFIG__?.location),
   publicUrl: getString(window.__APP_CONFIG__?.publicUrl),
   gdocSummaryId: getString(window.__APP_CONFIG__?.gdocSummaryId),

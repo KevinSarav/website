@@ -23,8 +23,9 @@ function parseSummaryDoc(text: string) {
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
 
-  const [availability = '', ...summaryLines] = lines
+  const [role = '', availability = '', ...summaryLines] = lines
   return {
+    role,
     availability,
     summary: summaryLines.join(' '),
   }
@@ -38,10 +39,18 @@ function parseHighlights(text: string) {
 }
 
 function App() {
-  const [summary, setSummary] = useState(siteContent.summary)
+  const [role, setRole] = useState('')
+  const [summary, setSummary] = useState('')
   const [availability, setAvailability] = useState('')
-  const [highlights, setHighlights] = useState<string[]>([...siteContent.highlights])
-  const metaItems = [siteContent.location, availability].filter((value) => value.length > 0)
+  const [isProfileDocLoading, setIsProfileDocLoading] = useState(siteContent.summaryDocId.length > 0)
+  const [isResumeLoading, setIsResumeLoading] = useState(siteContent.resume.embedUrl.length > 0)
+  const [highlights, setHighlights] = useState<string[]>([])
+  const [isHighlightsLoading, setIsHighlightsLoading] = useState(
+    siteContent.highlightsDocId.length > 0,
+  )
+  const roleLabel = isProfileDocLoading ? 'Loading role...' : role
+  const availabilityMeta = isProfileDocLoading ? 'Loading availability...' : availability
+  const metaItems = [siteContent.location, availabilityMeta].filter((value) => value.length > 0)
 
   useEffect(() => {
     let cancelled = false
@@ -51,6 +60,9 @@ function App() {
         try {
           const summaryText = await fetchDocText(siteContent.summaryDocId)
           const parsedSummaryDoc = parseSummaryDoc(summaryText)
+          if (!cancelled && parsedSummaryDoc.role.length > 0) {
+            setRole(parsedSummaryDoc.role)
+          }
           if (!cancelled && parsedSummaryDoc.availability.length > 0) {
             setAvailability(parsedSummaryDoc.availability)
           }
@@ -59,6 +71,10 @@ function App() {
           }
         } catch {
           // Keep local fallback content when Google Doc fetch fails.
+        } finally {
+          if (!cancelled) {
+            setIsProfileDocLoading(false)
+          }
         }
       }
 
@@ -71,6 +87,10 @@ function App() {
           }
         } catch {
           // Keep local fallback content when Google Doc fetch fails.
+        } finally {
+          if (!cancelled) {
+            setIsHighlightsLoading(false)
+          }
         }
       }
     }
@@ -86,9 +106,10 @@ function App() {
     <main className="page-shell">
       <section className="hero-panel">
         <div className="hero-copy">
-          <p className="eyebrow">{siteContent.role}</p>
+          {roleLabel.length > 0 ? <p className="eyebrow">{roleLabel}</p> : null}
           <h1>{siteContent.name}</h1>
-          {summary.length > 0 ? <p className="lede">{summary}</p> : null}
+          {isProfileDocLoading ? <p className="lede">Loading summary...</p> : null}
+          {!isProfileDocLoading && summary.length > 0 ? <p className="lede">{summary}</p> : null}
           {metaItems.length > 0 ? (
             <div className="meta-row">
               {metaItems.map((item, index) => (
@@ -102,7 +123,11 @@ function App() {
       <section className="content-grid" aria-label="Professional overview">
         <div className="info-card">
           <p className="card-label">Highlights</p>
-          {highlights.length > 0 ? (
+          {isHighlightsLoading ? (
+            <div className="note-list">
+              <p>Loading highlights...</p>
+            </div>
+          ) : highlights.length > 0 ? (
             <div className="note-list">
               {highlights.map((note, index) => (
                 <p key={`${note}-${index}`}>{note}</p>
@@ -149,12 +174,21 @@ function App() {
 
           {siteContent.resume.embedUrl.length > 0 ? (
             <>
-              <iframe
-                className="resume-frame"
-                src={siteContent.resume.embedUrl}
-                title={`${siteContent.name} resume`}
-                loading="lazy"
-              />
+              <div className="resume-frame-wrap">
+                {isResumeLoading ? (
+                  <div className="resume-loading" aria-live="polite">
+                    <p>Loading resume...</p>
+                  </div>
+                ) : null}
+                <iframe
+                  className={`resume-frame${isResumeLoading ? ' is-loading' : ''}`}
+                  src={siteContent.resume.embedUrl}
+                  title={`${siteContent.name} resume`}
+                  loading="lazy"
+                  onLoad={() => setIsResumeLoading(false)}
+                  onError={() => setIsResumeLoading(false)}
+                />
+              </div>
               {siteContent.resume.downloadUrl.length > 0 ? (
                 <p className="resume-help">If preview is unavailable, open the Google Docs or PDF.</p>
               ) : null}

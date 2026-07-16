@@ -32,7 +32,6 @@ envContent.split('\n').forEach(line => {
 const config = {
   SITE_APP_NAME: process.env.SITE_APP_NAME || env.SITE_APP_NAME || 'Website',
   PROFILE_MY_NAME: process.env.PROFILE_MY_NAME || env.PROFILE_MY_NAME || 'REPLACE_ME',
-  PROFILE_ROLE: process.env.PROFILE_ROLE || env.PROFILE_ROLE || 'REPLACE_ME',
   PROFILE_CITY: process.env.PROFILE_CITY || env.PROFILE_CITY || '',
   PROFILE_REGION: process.env.PROFILE_REGION || env.PROFILE_REGION || '',
   PROFILE_COUNTRY: process.env.PROFILE_COUNTRY || env.PROFILE_COUNTRY || '',
@@ -60,7 +59,6 @@ const resumeDownloadUrl = gdocBase ? `${gdocBase}/export?format=pdf&download=1` 
 const configJs = `window.__APP_CONFIG__ = {
   appName: '${escapeJs(config.SITE_APP_NAME)}',
   myName: '${escapeJs(config.PROFILE_MY_NAME)}',
-  role: '${escapeJs(config.PROFILE_ROLE)}',
   location: '${escapeJs(resolvedLocation)}',
   publicUrl: '${escapeJs(config.SITE_PUBLIC_URL)}',
   gdocSummaryId: '${escapeJs(config.SITE_GDOC_SUMMARY_ID)}',

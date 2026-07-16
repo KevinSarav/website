@@ -7,7 +7,6 @@ escape_js() {
 
 app_name="${SITE_APP_NAME:-Website}"
 my_name="${PROFILE_MY_NAME:-Kevin Saravia}"
-role="${PROFILE_ROLE:-REPLACE_ME}"
 profile_city="${PROFILE_CITY:-}"
 profile_region="${PROFILE_REGION:-}"
 profile_country="${PROFILE_COUNTRY:-}"
@@ -63,7 +62,6 @@ cat > /usr/share/nginx/html/runtime-config.js <<EOF
 window.__APP_CONFIG__ = {
   appName: "$(escape_js "$app_name")",
   myName: "$(escape_js "$my_name")",
-  role: "$(escape_js "$role")",
   location: "$(escape_js "$location")",
   publicUrl: "$(escape_js "$public_url")",
   gdocSummaryId: "$(escape_js "$gdoc_summary_id")",

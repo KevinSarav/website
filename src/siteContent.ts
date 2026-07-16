@@ -4,7 +4,6 @@ import { profileContent } from './profileContent'
 export const siteContent = {
   appName: runtimeConfig.appName,
   name: runtimeConfig.myName,
-  role: runtimeConfig.role,
   summary: profileContent.summary,
   summaryDocId: runtimeConfig.gdocSummaryId,
   location: runtimeConfig.location,

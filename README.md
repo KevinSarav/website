@@ -16,7 +16,7 @@ Site runs on `http://localhost:5173` with `SITE_PUBLIC_URL=http://localhost:5173
 ## Deployment
 
 Configuration in `.env` (committed to repo):
-- `SITE_APP_NAME`, `PROFILE_MY_NAME`, `PROFILE_ROLE` — profile metadata
+- `SITE_APP_NAME`, `PROFILE_MY_NAME` — profile metadata
 - `PROFILE_CITY`, `PROFILE_REGION`, `PROFILE_COUNTRY` — location metadata shown as `City, Region, Country`
 - `SITE_GDOC_SUMMARY_ID` — Google Doc ID used for the profile summary text
 - `SITE_GDOC_HIGHLIGHTS_ID` — Google Doc ID used for highlights (one line per highlight)
@@ -26,8 +26,7 @@ Configuration in `.env` (committed to repo):
 
 Content editing:
 - Google Docs provide runtime content for summary and highlights via `SITE_GDOC_SUMMARY_ID` and `SITE_GDOC_HIGHLIGHTS_ID`.
-- In the summary Google Doc, the first non-empty line is used as availability, and the remaining non-empty lines are joined as summary text.
-- `src/profileContent.ts` is used as fallback content if Google Doc fetch fails.
+- In the summary Google Doc, the first non-empty line is used as role, the second non-empty line is used as availability, and the remaining non-empty lines are joined as summary text.
 
 ### Option 1: Web Hosting (Recommended)
 
