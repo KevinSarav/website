@@ -37,6 +37,7 @@ const config = {
   PROFILE_COUNTRY: process.env.PROFILE_COUNTRY || env.PROFILE_COUNTRY || '',
   SITE_PUBLIC_URL: process.env.SITE_PUBLIC_URL || env.SITE_PUBLIC_URL || '',
   SITE_GDOC_RESUME_ID: process.env.SITE_GDOC_RESUME_ID || env.SITE_GDOC_RESUME_ID || '',
+  SITE_GDOC_PROFILE_ID: process.env.SITE_GDOC_PROFILE_ID || env.SITE_GDOC_PROFILE_ID || '',
   SITE_GDOC_SUMMARY_ID: process.env.SITE_GDOC_SUMMARY_ID || env.SITE_GDOC_SUMMARY_ID || '',
   SITE_GDOC_HIGHLIGHTS_ID: process.env.SITE_GDOC_HIGHLIGHTS_ID || env.SITE_GDOC_HIGHLIGHTS_ID || '',
   RESUME_PDF_FILE_NAME:
@@ -61,6 +62,7 @@ const configJs = `window.__APP_CONFIG__ = {
   myName: '${escapeJs(config.PROFILE_MY_NAME)}',
   location: '${escapeJs(resolvedLocation)}',
   publicUrl: '${escapeJs(config.SITE_PUBLIC_URL)}',
+  gdocProfileId: '${escapeJs(config.SITE_GDOC_PROFILE_ID)}',
   gdocSummaryId: '${escapeJs(config.SITE_GDOC_SUMMARY_ID)}',
   gdocHighlightsId: '${escapeJs(config.SITE_GDOC_HIGHLIGHTS_ID)}',
   resumeOpenUrl: '${escapeJs(resumeOpenUrl)}',

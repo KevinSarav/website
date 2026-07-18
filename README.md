@@ -16,8 +16,10 @@ Site runs on `http://localhost:5173` with `SITE_PUBLIC_URL=http://localhost:5173
 ## Deployment
 
 Configuration in `.env` (committed to repo):
+
 - `SITE_APP_NAME`, `PROFILE_MY_NAME` — profile metadata
 - `PROFILE_CITY`, `PROFILE_REGION`, `PROFILE_COUNTRY` — location metadata shown as `City, Region, Country`
+- `SITE_GDOC_PROFILE_ID` — Google Doc ID used for the profile section (role and contact bubbles)
 - `SITE_GDOC_SUMMARY_ID` — Google Doc ID used for the profile summary text
 - `SITE_GDOC_HIGHLIGHTS_ID` — Google Doc ID used for highlights (one line per highlight)
 - `SITE_GDOC_RESUME_ID` — the Google Docs document ID (format: `https://docs.google.com/document/d/{ID}/...`). Share the doc as "Anyone with the link can view".
@@ -25,8 +27,10 @@ Configuration in `.env` (committed to repo):
 - `SITE_PUBLIC_URL` — optional for local development; deployment workflows now set this per target
 
 Content editing:
-- Google Docs provide runtime content for summary and highlights via `SITE_GDOC_SUMMARY_ID` and `SITE_GDOC_HIGHLIGHTS_ID`.
-- In the summary Google Doc, the first line is the profie role displayed at the top of the page, with every new line after being is its own bubble after the location bubble, and the last line is used as summary text.
+
+- Google Docs provide runtime content for profile, summary, and highlights via `SITE_GDOC_PROFILE_ID`, `SITE_GDOC_SUMMARY_ID`, and `SITE_GDOC_HIGHLIGHTS_ID`.
+- In the profile Google Doc, the first line is the role displayed at the top of the page, with every new line after being its own bubble (phone, email, websites).
+- In the summary Google Doc, the first line is the summary text, with every new line after being its own bubble after the location bubble.
 
 ### Option 1: Web Hosting (Recommended)
 
@@ -39,6 +43,7 @@ Deploy to a web hosting service like Cloudflare Pages, GitHub Pages, Netlify, et
 5. Deploys on every push to `main`
 
 GitHub Pages workflow behavior:
+
 - Resolves `SITE_PUBLIC_URL` using `vars.SITE_PUBLIC_URL` from environment `production-online`, otherwise `CNAME`, otherwise `{owner}.github.io/{repo}`.
 - Resolves `VITE_BASE_PATH` as `/` for custom-domain deploys and `/{repo}/` for project-page deploys.
 - Generates `public/runtime-config.js` using the resolved deployment URL (not localhost).
@@ -51,6 +56,7 @@ This is the simplest option — no server to manage.
 Run the site as a Docker container on your own hardware:
 
 1. Build and run locally:
+
    ```bash
    docker compose up -d --build
    ```
@@ -67,6 +73,7 @@ Run the site as a Docker container on your own hardware:
    - `DEPLOY_SSH_PRIVATE_KEY` — private SSH key for authentication
 
 Docker workflow behavior:
+
 - Resolves `SITE_PUBLIC_URL` using `vars.SITE_PUBLIC_URL` (or `secrets.SITE_PUBLIC_URL`) from environment `production-selfhost`, then `CNAME`.
 - Fails fast if no production URL can be resolved.
 - Passes `SITE_PUBLIC_URL` into image build and runtime config generation.

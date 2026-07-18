@@ -3,6 +3,7 @@ import { runtimeConfig } from "./runtimeConfig";
 export const siteContent = {
   appName: runtimeConfig.appName,
   name: runtimeConfig.myName,
+  profileDocId: runtimeConfig.gdocProfileId,
   summaryDocId: runtimeConfig.gdocSummaryId,
   location: runtimeConfig.location,
   highlightsDocId: runtimeConfig.gdocHighlightsId,

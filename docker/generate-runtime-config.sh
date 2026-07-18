@@ -12,6 +12,7 @@ profile_region="${PROFILE_REGION:-}"
 profile_country="${PROFILE_COUNTRY:-}"
 public_url="${SITE_PUBLIC_URL:-}"
 gdoc_resume_id="${SITE_GDOC_RESUME_ID:-}"
+gdoc_profile_id="${SITE_GDOC_PROFILE_ID:-}"
 gdoc_summary_id="${SITE_GDOC_SUMMARY_ID:-}"
 gdoc_highlights_id="${SITE_GDOC_HIGHLIGHTS_ID:-}"
 resume_pdf_file_name="${RESUME_PDF_FILE_NAME:-Kevin_Saravia_Resume.pdf}"
@@ -64,6 +65,7 @@ window.__APP_CONFIG__ = {
   myName: "$(escape_js "$my_name")",
   location: "$(escape_js "$location")",
   publicUrl: "$(escape_js "$public_url")",
+  gdocProfileId: "$(escape_js "$gdoc_profile_id")",
   gdocSummaryId: "$(escape_js "$gdoc_summary_id")",
   gdocHighlightsId: "$(escape_js "$gdoc_highlights_id")",
   gdocResumeId: "$(escape_js "$gdoc_resume_id")",

@@ -29,14 +29,23 @@ function parseSummaryDoc(text: string) {
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
 
-  const [role = "", ...remainingLines] = lines;
-  const summary =
-    remainingLines.length > 0 ? remainingLines[remainingLines.length - 1] : "";
-  const metaItems = remainingLines.slice(0, -1);
+  const [summary = "", ...metaItems] = lines;
   return {
-    role,
     summary,
     metaItems,
+  };
+}
+
+function parseProfileDoc(text: string) {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  const [role = "", ...profileHighlights] = lines;
+  return {
+    role,
+    profileHighlights,
   };
 }
 
@@ -50,13 +59,18 @@ function parseHighlights(text: string) {
 function App() {
   const [role, setRole] = useState("");
   const [summary, setSummary] = useState("");
+  const [profileHighlights, setProfileHighlights] = useState<string[]>([]);
   const [metaItems, setMetaItems] = useState(
     siteContent.location.length > 0 ? [siteContent.location] : [],
   );
   const [isProfileDocLoading, setIsProfileDocLoading] = useState(
-    siteContent.summaryDocId.length > 0,
+    siteContent.profileDocId.length > 0,
   );
   const [hasProfileDocLoadError, setHasProfileDocLoadError] = useState(false);
+  const [isSummaryDocLoading, setIsSummaryDocLoading] = useState(
+    siteContent.summaryDocId.length > 0,
+  );
+  const [hasSummaryDocLoadError, setHasSummaryDocLoadError] = useState(false);
   const [isResumeLoading, setIsResumeLoading] = useState(
     siteContent.resume.embedUrl.length > 0,
   );
@@ -71,13 +85,35 @@ function App() {
     let cancelled = false;
 
     const loadProfileContent = async () => {
+      if (siteContent.profileDocId.length > 0) {
+        try {
+          const profileText = await fetchDocText(siteContent.profileDocId);
+          const parsedProfileDoc = parseProfileDoc(profileText);
+          if (!cancelled && parsedProfileDoc.role.length > 0) {
+            setRole(parsedProfileDoc.role);
+          }
+          if (!cancelled) {
+            const filteredProfileHighlights =
+              parsedProfileDoc.profileHighlights.filter(
+                (item) => item.length > 0,
+              );
+            setProfileHighlights(filteredProfileHighlights);
+          }
+        } catch {
+          if (!cancelled) {
+            setHasProfileDocLoadError(true);
+          }
+        } finally {
+          if (!cancelled) {
+            setIsProfileDocLoading(false);
+          }
+        }
+      }
+
       if (siteContent.summaryDocId.length > 0) {
         try {
           const summaryText = await fetchDocText(siteContent.summaryDocId);
           const parsedSummaryDoc = parseSummaryDoc(summaryText);
-          if (!cancelled && parsedSummaryDoc.role.length > 0) {
-            setRole(parsedSummaryDoc.role);
-          }
           if (!cancelled && parsedSummaryDoc.summary.length > 0) {
             setSummary(parsedSummaryDoc.summary);
           }
@@ -93,11 +129,11 @@ function App() {
           }
         } catch {
           if (!cancelled) {
-            setHasProfileDocLoadError(true);
+            setHasSummaryDocLoadError(true);
           }
         } finally {
           if (!cancelled) {
-            setIsProfileDocLoading(false);
+            setIsSummaryDocLoading(false);
           }
         }
       }
@@ -132,10 +168,16 @@ function App() {
 
   return (
     <main className="page-shell">
-      <ProfileHeader roleLabel={roleLabel} />
-      <SummarySection
+      <ProfileHeader
         isProfileDocLoading={isProfileDocLoading}
         hasProfileDocLoadError={hasProfileDocLoadError}
+        profileDocId={siteContent.profileDocId}
+        roleLabel={roleLabel}
+        profileHighlights={profileHighlights}
+      />
+      <SummarySection
+        isSummaryDocLoading={isSummaryDocLoading}
+        hasSummaryDocLoadError={hasSummaryDocLoadError}
         summaryDocId={siteContent.summaryDocId}
         summary={summary}
         metaItems={metaItems}
