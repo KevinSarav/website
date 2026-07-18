@@ -152,6 +152,13 @@
   border: none;
   font-family: inherit;
   white-space: nowrap;
+  /* Mobile-friendly: ensure link is always clickable */
+  pointer-events: auto;
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .meta-row .meta-link:hover {
