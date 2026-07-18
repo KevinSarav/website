@@ -26,7 +26,7 @@ Configuration in `.env` (committed to repo):
 
 Content editing:
 - Google Docs provide runtime content for summary and highlights via `SITE_GDOC_SUMMARY_ID` and `SITE_GDOC_HIGHLIGHTS_ID`.
-- In the summary Google Doc, the first non-empty line is used as role, the second non-empty line is used as availability, and the remaining non-empty lines are joined as summary text.
+- In the summary Google Doc, the first line is the profie role displayed at the top of the page, with every new line after being is its own bubble after the location bubble, and the last line is used as summary text.
 
 ### Option 1: Web Hosting (Recommended)
 

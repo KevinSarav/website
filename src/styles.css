@@ -1,11 +1,29 @@
 :root {
   color-scheme: light;
   font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --text-strong: #17202a;
+  --text-body: #40505e;
+  --text-muted: #223244;
+  --text-accent: #8b4b19;
+  --card-label: #b39d24;
+  --surface-border: rgba(23, 32, 42, 0.08);
+  --surface-bg: rgba(255, 255, 255, 0.8);
+  --surface-shadow: 0 24px 80px rgba(23, 32, 42, 0.12);
+  --chip-bg: rgba(23, 32, 42, 0.05);
+  --radius-panel: 30px;
+  --radius-card: 24px;
+  --radius-frame: 22px;
+  --size-title: clamp(3.2rem, 9vw, 6rem);
+  --size-role: 1.5rem;
+  --size-summary: 1.12rem;
+  --size-eyebrow: 0.9rem;
+  --size-resume-label: 3.5rem;
+  --line-body: 1.75;
   background:
     radial-gradient(circle at top, rgba(244, 168, 89, 0.18), transparent 26%),
     radial-gradient(circle at right, rgba(57, 85, 217, 0.12), transparent 24%),
     linear-gradient(160deg, #f5efe4 0%, #ebf1f8 45%, #f8fafc 100%);
-  color: #17202a;
+  color: var(--text-strong);
 }
 
 * {
@@ -29,57 +47,52 @@ body {
   padding: 2rem 0 4rem;
 }
 
-.hero-panel,
-.content-grid,
+.profile-panel,
+.summary-panel,
+.highlights-panel,
 .resume-panel {
-  border: 1px solid rgba(23, 32, 42, 0.08);
-  border-radius: 30px;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 24px 80px rgba(23, 32, 42, 0.12);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-panel);
+  background: var(--surface-bg);
+  box-shadow: var(--surface-shadow);
   backdrop-filter: blur(14px);
 }
 
-.hero-panel {
-  display: grid;
-  grid-template-columns: 1.4fr 0.9fr;
-  gap: 1.5rem;
+.profile-panel {
   padding: clamp(2rem, 4vw, 4rem);
 }
 
-.hero-copy {
+.profile-copy {
   display: grid;
   align-content: start;
 }
 
-.hero-aside {
-  display: grid;
-}
-
-.eyebrow {
-  margin: 0 0 1rem;
-  font-size: 0.85rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #8b4b19;
-}
-
-h1,
-h2 {
+.profile-name {
   margin: 0;
-}
-
-h1 {
-  font-size: clamp(3.2rem, 9vw, 6rem);
+  font-size: var(--size-title);
   line-height: 0.9;
   letter-spacing: -0.05em;
 }
 
-.lede {
-  margin: 1.5rem 0 0;
+.profile-role-label {
+  margin: 0.75rem 0 0;
+  font-size: var(--size-role);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-accent);
+}
+
+.summary-lede {
+  margin: 0;
   max-width: 42rem;
-  font-size: 1.12rem;
+  font-size: var(--size-summary);
   line-height: 1.8;
-  color: #40505e;
+  color: var(--text-body);
+}
+
+.summary-lede-loading {
+  font-size: var(--size-summary);
+  color: var(--text-body);
 }
 
 .meta-row {
@@ -92,90 +105,47 @@ h1 {
 .meta-row span {
   padding: 0.8rem 1rem;
   border-radius: 999px;
-  background: rgba(23, 32, 42, 0.05);
-  color: #223244;
+  background: var(--chip-bg);
+  color: var(--text-muted);
   font-size: 0.95rem;
 }
 
-.content-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 1.25rem;
+.summary-panel {
+  margin-top: 1.25rem;
+  padding: 1.5rem;
+}
+
+.highlights-panel {
   margin-top: 1.25rem;
   padding: 1.25rem;
 }
 
 .info-card {
   padding: 1.4rem;
-  border-radius: 24px;
+  border-radius: var(--radius-card);
   background: rgba(252, 252, 252, 0.92);
   min-height: 100%;
 }
 
-.accent-card {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.84)),
-    linear-gradient(145deg, rgba(244, 168, 89, 0.25), rgba(57, 85, 217, 0.12));
-}
-
 .card-label {
   margin: 0 0 1rem;
-  font-size: 0.78rem;
+  font-size: var(--size-eyebrow);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #6e7d8d;
+  color: var(--card-label);
 }
 
-.stack-list,
-.highlight-list,
-.note-list {
-  margin: 0;
-  padding: 0;
-}
-
-.stack-list {
-  list-style: none;
-  display: grid;
-  gap: 0.9rem;
-}
-
-.stack-list li {
-  padding: 0.95rem 1rem;
-  border-radius: 18px;
-  background: rgba(23, 32, 42, 0.05);
-  color: #223244;
-}
-
-.highlight-list {
-  display: grid;
-  gap: 1rem;
-}
-
-.highlight-item {
-  padding: 1rem 0;
-  border-top: 1px solid rgba(23, 32, 42, 0.08);
-}
-
-.highlight-item:first-child {
-  border-top: 0;
-  padding-top: 0;
-}
-
-.highlight-item h2 {
-  font-size: 1.25rem;
-  margin-bottom: 0.45rem;
-}
-
-.highlight-item p,
-.note-list p,
+.highlights-list p,
 .resume-placeholder p,
 .resume-help {
   margin: 0;
-  line-height: 1.75;
-  color: #40505e;
+  line-height: var(--line-body);
+  color: var(--text-body);
 }
 
-.note-list {
+.highlights-list {
+  margin: 0;
+  padding: 0;
   display: grid;
   gap: 1rem;
 }
@@ -193,11 +163,6 @@ h1 {
   margin-bottom: 1.25rem;
 }
 
-.resume-header h2 {
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
-  line-height: 1.05;
-}
-
 .primary-button {
   display: inline-flex;
   align-items: center;
@@ -210,7 +175,10 @@ h1 {
   text-decoration: none;
   font-weight: 600;
   box-shadow: 0 10px 24px rgba(29, 108, 255, 0.35);
-  transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  transition:
+    background-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
 }
 
 .primary-button:hover {
@@ -245,7 +213,10 @@ h1 {
   cursor: pointer;
   font: inherit;
   box-shadow: 0 8px 20px rgba(23, 32, 42, 0.12);
-  transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease,
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
     transform 0.18s ease;
 }
 
@@ -265,8 +236,8 @@ h1 {
 .resume-placeholder {
   width: 100%;
   min-height: 70vh;
-  border: 1px solid rgba(23, 32, 42, 0.08);
-  border-radius: 22px;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-frame);
   background: rgba(244, 246, 249, 0.9);
 }
 
@@ -284,8 +255,8 @@ h1 {
   display: grid;
   place-items: center;
   padding: 2rem;
-  border: 1px solid rgba(23, 32, 42, 0.08);
-  border-radius: 22px;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-frame);
   background: rgba(244, 246, 249, 0.9);
 }
 
@@ -305,16 +276,7 @@ h1 {
   padding: 2rem;
 }
 
-strong {
-  color: #17202a;
-}
-
 @media (max-width: 900px) {
-  .hero-panel,
-  .content-grid {
-    grid-template-columns: 1fr;
-  }
-
   .resume-header {
     align-items: start;
     flex-direction: column;
@@ -327,8 +289,9 @@ strong {
     padding: 1rem 0 2rem;
   }
 
-  .hero-panel,
-  .content-grid,
+  .profile-panel,
+  .summary-panel,
+  .highlights-panel,
   .resume-panel {
     border-radius: 22px;
   }
