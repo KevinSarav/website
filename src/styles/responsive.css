@@ -1,0 +1,251 @@
+/* Responsive Design - Mobile First */
+
+/* Tablets and below (768px) */
+@media (max-width: 900px) {
+  .resume-header {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --size-title: clamp(2rem, 8vw, 3.5rem);
+    --size-role: 1.2rem;
+    --size-summary: 1rem;
+  }
+
+  .page-shell {
+    width: calc(100% - 1rem);
+    padding: 1rem 0 2rem;
+  }
+
+  .profile-panel {
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .profile-header-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .github-badge img {
+    height: 24px;
+  }
+
+  .meta-row {
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+  }
+
+  .meta-row span,
+  .meta-row .meta-link {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .summary-panel,
+  .highlights-panel,
+  .resume-panel {
+    padding: 1rem;
+  }
+
+  .info-card {
+    padding: 1rem;
+  }
+
+  .resume-header {
+    margin-bottom: 1rem;
+  }
+
+  .primary-button,
+  .secondary-button {
+    min-height: 44px;
+    padding: 0.7rem 0.95rem;
+    font-size: 0.95rem;
+  }
+
+  .resume-actions {
+    gap: 0.5rem;
+  }
+}
+
+/* Small phones (640px) */
+@media (max-width: 640px) {
+  :root {
+    --size-title: clamp(1.75rem, 7vw, 2.5rem);
+    --size-role: 1rem;
+    --size-summary: 0.95rem;
+    --size-eyebrow: 0.8rem;
+  }
+
+  .page-shell {
+    width: min(100% - 0.75rem, 1180px);
+    padding: 0.75rem 0 1.5rem;
+  }
+
+  body {
+    min-width: 320px;
+  }
+
+  .profile-panel,
+  .summary-panel,
+  .highlights-panel,
+  .resume-panel {
+    border-radius: 20px;
+    margin-top: 0.75rem;
+  }
+
+  .profile-panel {
+    padding: 1.25rem;
+  }
+
+  .info-card,
+  .resume-frame,
+  .resume-placeholder {
+    border-radius: 16px;
+    padding: 1rem;
+  }
+
+  .profile-header-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .profile-name {
+    line-height: 1;
+    word-break: break-word;
+  }
+
+  .github-badge {
+    margin-top: 0.5rem;
+  }
+
+  .github-badge img {
+    height: 22px;
+  }
+
+  .profile-role-label {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+  }
+
+  .meta-row {
+    gap: 0.4rem;
+    margin-top: 1rem;
+  }
+
+  .meta-row span,
+  .meta-row .meta-link {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.85rem;
+  }
+
+  .summary-panel,
+  .highlights-panel,
+  .resume-panel {
+    padding: 0.75rem;
+  }
+
+  .card-label {
+    margin: 0 0 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .summary-lede {
+    max-width: 100%;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .highlights-list {
+    gap: 0.75rem;
+  }
+
+  .primary-button,
+  .secondary-button {
+    min-height: 40px;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.9rem;
+    border-radius: 24px;
+  }
+
+  .resume-actions {
+    gap: 0.4rem;
+    flex-direction: column;
+  }
+
+  .resume-actions .primary-button,
+  .resume-actions .secondary-button {
+    width: 100%;
+  }
+
+  .resume-frame,
+  .resume-placeholder {
+    min-height: 50vh;
+  }
+
+  .resume-loading {
+    padding: 1rem;
+  }
+}
+
+/* Extra small phones (480px) */
+@media (max-width: 480px) {
+  :root {
+    --size-title: clamp(1.5rem, 6vw, 2rem);
+    --size-role: 0.9rem;
+    --size-summary: 0.9rem;
+  }
+
+  .page-shell {
+    width: calc(100% - 0.5rem);
+    padding: 0.5rem 0 1rem;
+  }
+
+  .profile-panel,
+  .summary-panel,
+  .highlights-panel,
+  .resume-panel {
+    border-radius: 16px;
+    margin-top: 0.5rem;
+  }
+
+  .profile-panel {
+    padding: 1rem;
+  }
+
+  .profile-name {
+    letter-spacing: -0.03em;
+  }
+
+  .github-badge img {
+    height: 20px;
+  }
+
+  .meta-row {
+    gap: 0.35rem;
+    margin-top: 0.75rem;
+  }
+
+  .meta-row span,
+  .meta-row .meta-link {
+    padding: 0.45rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .info-card {
+    padding: 0.75rem;
+  }
+
+  .card-label {
+    font-size: 0.7rem;
+  }
+
+  .resume-frame,
+  .resume-placeholder {
+    min-height: 40vh;
+  }
+}

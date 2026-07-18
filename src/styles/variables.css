@@ -1,0 +1,41 @@
+/* CSS Variables and Root Styles */
+
+:root {
+  color-scheme: light;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+
+  /* Colors */
+  --text-strong: #17202a;
+  --text-body: #40505e;
+  --text-muted: #223244;
+  --text-accent: #8b4b19;
+  --card-label: #b39d24;
+
+  /* Surface */
+  --surface-border: rgba(23, 32, 42, 0.08);
+  --surface-bg: rgba(255, 255, 255, 0.8);
+  --surface-shadow: 0 24px 80px rgba(23, 32, 42, 0.12);
+
+  /* Components */
+  --chip-bg: rgba(23, 32, 42, 0.05);
+
+  /* Border Radius */
+  --radius-panel: 30px;
+  --radius-card: 24px;
+  --radius-frame: 22px;
+
+  /* Typography */
+  --size-title: clamp(3.2rem, 9vw, 6rem);
+  --size-role: 1.5rem;
+  --size-summary: 1.12rem;
+  --size-eyebrow: 0.9rem;
+  --size-resume-label: 3.5rem;
+  --line-body: 1.75;
+
+  /* Background */
+  background:
+    radial-gradient(circle at top, rgba(244, 168, 89, 0.18), transparent 26%),
+    radial-gradient(circle at right, rgba(57, 85, 217, 0.12), transparent 24%),
+    linear-gradient(160deg, #f5efe4 0%, #ebf1f8 45%, #f8fafc 100%);
+  color: var(--text-strong);
+}

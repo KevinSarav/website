@@ -5,7 +5,7 @@ import { HighlightsSection } from "./components/HighlightsSection";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { ResumeSection } from "./components/ResumeSection";
 import { SummarySection } from "./components/SummarySection";
-import "./styles.css";
+import "./styles/main.css";
 
 document.title = siteContent.appName;
 
