@@ -9,7 +9,6 @@ on:
 permissions:
   contents: read
   packages: write
-  actions: write
 
 jobs:
   build-and-publish:
@@ -32,9 +31,6 @@ jobs:
         env:
           SITE_PUBLIC_URL_VAR: ${{ vars.SITE_PUBLIC_URL }}
           SITE_PUBLIC_URL_SECRET: ${{ secrets.SITE_PUBLIC_URL }}
-          PROFILE_CITY_VAR: ${{ vars.PROFILE_CITY }}
-          PROFILE_REGION_VAR: ${{ vars.PROFILE_REGION }}
-          PROFILE_COUNTRY_VAR: ${{ vars.PROFILE_COUNTRY }}
         run: |
           set -euo pipefail
 
@@ -52,9 +48,6 @@ jobs:
 
           echo "SITE_PUBLIC_URL=$resolved_url" >> "$GITHUB_ENV"
           echo "VITE_BASE_PATH=/" >> "$GITHUB_ENV"
-          echo "PROFILE_CITY=${PROFILE_CITY_VAR:-}" >> "$GITHUB_ENV"
-          echo "PROFILE_REGION=${PROFILE_REGION_VAR:-}" >> "$GITHUB_ENV"
-          echo "PROFILE_COUNTRY=${PROFILE_COUNTRY_VAR:-}" >> "$GITHUB_ENV"
           echo "Resolved SITE_PUBLIC_URL=$resolved_url"
 
       - name: Log in to GHCR
@@ -150,242 +143,17 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
-      - name: Detect self-host geolocation
-        id: detect_geo
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          remote_ip="$(ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "(curl -fsSL --retry 2 --retry-delay 1 --retry-all-errors https://api.ipify.org || curl -fsSL --retry 2 --retry-delay 1 --retry-all-errors https://ifconfig.me) 2>/dev/null" || true)"
-
-          remote_ip="$(printf '%s' "$remote_ip" | tr -d '[:space:]')"
-          if [[ -z "$remote_ip" ]]; then
-            echo "Could not resolve self-host public IP. Skipping geolocation sync."
-            echo "city=" >> "$GITHUB_OUTPUT"
-            echo "region=" >> "$GITHUB_OUTPUT"
-            echo "country=" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          city=""
-          region=""
-          country=""
-
-          # Provider 1: ipapi.co
-          geo_json="$(curl -fsSL --retry 2 --retry-delay 1 --retry-all-errors "https://ipapi.co/${remote_ip}/json/" 2>/dev/null || true)"
-          if [[ -n "$geo_json" ]]; then
-            city="$(printf '%s' "$geo_json" | jq -r '.city // empty' 2>/dev/null || true)"
-            region="$(printf '%s' "$geo_json" | jq -r '.region // empty' 2>/dev/null || true)"
-            country="$(printf '%s' "$geo_json" | jq -r '.country_name // empty' 2>/dev/null || true)"
-          fi
-
-          # Provider 2 fallback: ipwho.is
-          if [[ -z "$city" || -z "$region" || -z "$country" ]]; then
-            geo_json="$(curl -fsSL --retry 2 --retry-delay 1 --retry-all-errors "https://ipwho.is/${remote_ip}" 2>/dev/null || true)"
-            if [[ -n "$geo_json" ]]; then
-              city="$(printf '%s' "$geo_json" | jq -r '.city // empty' 2>/dev/null || true)"
-              region="$(printf '%s' "$geo_json" | jq -r '.region // empty' 2>/dev/null || true)"
-              country="$(printf '%s' "$geo_json" | jq -r '.country // empty' 2>/dev/null || true)"
-            fi
-          fi
-
-          if [[ -z "$city" || -z "$region" || -z "$country" ]]; then
-            echo "Geolocation providers did not return full data. Skipping geolocation sync."
-          else
-            echo "Detected self-host location: $city, $region, $country"
-          fi
-
-          echo "city=$city" >> "$GITHUB_OUTPUT"
-          echo "region=$region" >> "$GITHUB_OUTPUT"
-          echo "country=$country" >> "$GITHUB_OUTPUT"
-
-      - name: Compare profile location with geolocation
-        id: compare_geo
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.LOCATION_SYNC_TOKEN || github.token }}
-          NEW_CITY: ${{ steps.detect_geo.outputs.city }}
-          NEW_REGION: ${{ steps.detect_geo.outputs.region }}
-          NEW_COUNTRY: ${{ steps.detect_geo.outputs.country }}
-        run: |
-          set -euo pipefail
-
-          if [[ -z "${NEW_CITY:-}" || -z "${NEW_REGION:-}" || -z "${NEW_COUNTRY:-}" ]]; then
-            echo "Incomplete geolocation from self-host. Skipping profile location sync."
-            echo "location_changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          repo="$GITHUB_REPOSITORY"
-          err_log="$(mktemp)"
-          trap 'rm -f "$err_log"' EXIT
-
-          get_repo_var_value() {
-            local key="$1"
-            gh api "repos/$repo/actions/variables" --jq ".variables[]? | select(.name == \"$key\") | .value" 2>"$err_log"
-          }
-
-          normalize_value() {
-            # Trim, collapse repeated spaces, and compare case-insensitively.
-            printf '%s' "$1" \
-              | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/[[:space:]]\+/ /g' \
-              | tr '[:upper:]' '[:lower:]'
-          }
-
-          if ! current_city="$(get_repo_var_value PROFILE_CITY)"; then
-            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
-              echo "::warning title=Location compare skipped::Token cannot read repository variables."
-            else
-              cat "$err_log"
-            fi
-            echo "Could not read PROFILE_CITY from repo variables. Skipping profile location sync."
-            echo "location_changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if ! current_region="$(get_repo_var_value PROFILE_REGION)"; then
-            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
-              echo "::warning title=Location compare skipped::Token cannot read repository variables."
-            else
-              cat "$err_log"
-            fi
-            echo "Could not read PROFILE_REGION from repo variables. Skipping profile location sync."
-            echo "location_changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if ! current_country="$(get_repo_var_value PROFILE_COUNTRY)"; then
-            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
-              echo "::warning title=Location compare skipped::Token cannot read repository variables."
-            else
-              cat "$err_log"
-            fi
-            echo "Could not read PROFILE_COUNTRY from repo variables. Skipping profile location sync."
-            echo "location_changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          new_city_normalized="$(normalize_value "$NEW_CITY")"
-          new_region_normalized="$(normalize_value "$NEW_REGION")"
-          new_country_normalized="$(normalize_value "$NEW_COUNTRY")"
-          current_city_normalized="$(normalize_value "$current_city")"
-          current_region_normalized="$(normalize_value "$current_region")"
-          current_country_normalized="$(normalize_value "$current_country")"
-
-          if [[ "$new_city_normalized" == "$current_city_normalized" && "$new_region_normalized" == "$current_region_normalized" && "$new_country_normalized" == "$current_country_normalized" ]]; then
-            echo "Profile location unchanged."
-            echo "location_changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "Location changed: '$current_city, $current_region, $current_country' -> '$NEW_CITY, $NEW_REGION, $NEW_COUNTRY'"
-          echo "location_changed=true" >> "$GITHUB_OUTPUT"
-
-      - name: Sync profile location vars
-        id: sync_geo
-        if: steps.compare_geo.outputs.location_changed == 'true'
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.LOCATION_SYNC_TOKEN }}
-          NEW_CITY: ${{ steps.detect_geo.outputs.city }}
-          NEW_REGION: ${{ steps.detect_geo.outputs.region }}
-          NEW_COUNTRY: ${{ steps.detect_geo.outputs.country }}
-        run: |
-          set -euo pipefail
-
-          if [[ -z "${GH_TOKEN:-}" ]]; then
-            echo "::warning title=Location sync skipped::Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Variables: write on this repo)."
-            echo "sync_performed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          repo="$GITHUB_REPOSITORY"
-          err_log="$(mktemp)"
-          trap 'rm -f "$err_log"' EXIT
-
-          if ! gh variable set PROFILE_CITY --repo "$repo" --body "$NEW_CITY" 2>"$err_log"; then
-            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
-              echo "::warning title=Location sync skipped::Token cannot write repository variables. Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Variables: write on this repo)."
-              echo "sync_performed=false" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            cat "$err_log"
-            exit 1
-          fi
-
-          if ! gh variable set PROFILE_REGION --repo "$repo" --body "$NEW_REGION" 2>"$err_log"; then
-            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
-              echo "::warning title=Location sync skipped::Token cannot write repository variables. Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Variables: write on this repo)."
-              echo "sync_performed=false" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            cat "$err_log"
-            exit 1
-          fi
-
-          if ! gh variable set PROFILE_COUNTRY --repo "$repo" --body "$NEW_COUNTRY" 2>"$err_log"; then
-            if grep -Eq "Resource not accessible by (integration|personal access token)" "$err_log"; then
-              echo "::warning title=Location sync skipped::Token cannot write repository variables. Set secret LOCATION_SYNC_TOKEN (fine-grained PAT with Variables: write on this repo)."
-              echo "sync_performed=false" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            cat "$err_log"
-            exit 1
-          fi
-
-          echo "Updated profile location to: $NEW_CITY, $NEW_REGION, $NEW_COUNTRY"
-          echo "sync_performed=true" >> "$GITHUB_OUTPUT"
-
-      - name: Resolve effective profile location for self-host deploy
-        id: deploy_profile
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.LOCATION_SYNC_TOKEN || github.token }}
-          NEW_CITY: ${{ steps.detect_geo.outputs.city }}
-          NEW_REGION: ${{ steps.detect_geo.outputs.region }}
-          NEW_COUNTRY: ${{ steps.detect_geo.outputs.country }}
-        run: |
-          set -euo pipefail
-
-          repo="$GITHUB_REPOSITORY"
-          city="$(gh api "repos/$repo/actions/variables" --jq '.variables[]? | select(.name == "PROFILE_CITY") | .value' 2>/dev/null || true)"
-          region="$(gh api "repos/$repo/actions/variables" --jq '.variables[]? | select(.name == "PROFILE_REGION") | .value' 2>/dev/null || true)"
-          country="$(gh api "repos/$repo/actions/variables" --jq '.variables[]? | select(.name == "PROFILE_COUNTRY") | .value' 2>/dev/null || true)"
-
-          # Prefer repo variables as source of truth; only fall back to detected geolocation when missing.
-          if [[ -z "$city" ]]; then
-            city="${NEW_CITY:-}"
-          fi
-          if [[ -z "$region" ]]; then
-            region="${NEW_REGION:-}"
-          fi
-          if [[ -z "$country" ]]; then
-            country="${NEW_COUNTRY:-}"
-          fi
-
-          echo "city=$city" >> "$GITHUB_OUTPUT"
-          echo "region=$region" >> "$GITHUB_OUTPUT"
-          echo "country=$country" >> "$GITHUB_OUTPUT"
-
       - name: Pull latest main and deploy on server
         shell: bash
         env:
           DEPLOY_BRANCH: ${{ github.ref_name }}
-          DEPLOY_CITY: ${{ steps.deploy_profile.outputs.city }}
-          DEPLOY_REGION: ${{ steps.deploy_profile.outputs.region }}
-          DEPLOY_COUNTRY: ${{ steps.deploy_profile.outputs.country }}
+          PROFILE_CITY: ${{ vars.PROFILE_CITY }}
+          PROFILE_REGION: ${{ vars.PROFILE_REGION }}
+          PROFILE_COUNTRY: ${{ vars.PROFILE_COUNTRY }}
         run: |
           set -euo pipefail
 
-          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' PROFILE_CITY='${DEPLOY_CITY:-}' PROFILE_REGION='${DEPLOY_REGION:-}' PROFILE_COUNTRY='${DEPLOY_COUNTRY:-}' bash '$DEPLOY_PATH/scripts/deploy-selfhost.sh'"
-
-      - name: Trigger remote deploy
-        if: steps.compare_geo.outputs.location_changed == 'true' && steps.sync_geo.outputs.sync_performed == 'true'
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          gh workflow run deploy-remote.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"
-          echo "Triggered deploy-remote.yml due to location change."
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' WEBSITE_IMAGE='$WEBSITE_IMAGE' GHCR_USERNAME='$GHCR_USERNAME' GHCR_TOKEN='$GHCR_TOKEN' PROFILE_CITY='${PROFILE_CITY:-}' PROFILE_REGION='${PROFILE_REGION:-}' PROFILE_COUNTRY='${PROFILE_COUNTRY:-}' bash '$DEPLOY_PATH/scripts/deploy-selfhost.sh'"
 
       - name: Cleanup old GHCR versions (keep 3)
         shell: bash
