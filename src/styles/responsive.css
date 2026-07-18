@@ -45,6 +45,12 @@
     font-size: 0.9rem;
   }
 
+  .meta-row .meta-link {
+    display: flex;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
   .summary-panel,
   .highlights-panel,
   .resume-panel {
@@ -143,6 +149,12 @@
     font-size: 0.85rem;
   }
 
+  .meta-row .meta-link {
+    display: flex;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
   .summary-panel,
   .highlights-panel,
   .resume-panel {
@@ -234,6 +246,12 @@
   .meta-row .meta-link {
     padding: 0.45rem 0.6rem;
     font-size: 0.8rem;
+  }
+
+  .meta-row .meta-link {
+    display: flex;
+    -webkit-appearance: none;
+    appearance: none;
   }
 
   .info-card {

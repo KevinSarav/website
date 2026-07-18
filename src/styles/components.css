@@ -1,5 +1,18 @@
 /* Component Styles */
 
+/* Animations */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 /* Layout */
 
 .page-shell {
@@ -141,7 +154,7 @@
   background: var(--chip-bg);
   color: var(--text-muted);
   font-size: 0.95rem;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
@@ -159,6 +172,9 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  /* Reset button default styles */
+  background-color: var(--chip-bg);
+  padding: 0.8rem 1rem;
 }
 
 .meta-row .meta-link:hover {
@@ -168,6 +184,22 @@
 
 .meta-row .meta-link:active {
   transform: scale(0.98);
+}
+
+.copy-notification {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-accent);
+  color: white;
+  padding: 0.85rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  animation: slideUp 0.3s ease-out;
 }
 
 /* Info Card */

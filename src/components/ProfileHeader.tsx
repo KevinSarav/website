@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { siteContent } from "../siteContent";
 
 type ProfileHeaderProps = {
@@ -27,7 +28,7 @@ function getGitHubBadgeUrl(githubLink: string): string {
   return `https://img.shields.io/badge/GitHub-Open_Repo-181717?logo=github&logoColor=white&style=flat`;
 }
 
-function renderProfileHighlight(item: string) {
+function renderProfileHighlight(item: string, onEmailCopied?: (email: string) => void) {
   // Phone number pattern - flexible to match various formats like 832-220-8363, (832) 220-8363, +1 832 220 8363, etc.
   const phoneRegex = /^[\d\s\-()+.]{7,}$|^\d{3}[-.\s]?\d{3}[-.\s]?\d{4}$/;
   // Email pattern
@@ -38,10 +39,32 @@ function renderProfileHighlight(item: string) {
 
   // Check email first (since @ is distinctive)
   if (emailRegex.test(item)) {
+    const handleEmailClick = async () => {
+      // First, try to open the email client
+      window.location.href = `mailto:${item}`;
+      
+      // After a short delay, if the page is still focused (mailto didn't open an app),
+      // fall back to copying to clipboard
+      setTimeout(async () => {
+        try {
+          await navigator.clipboard.writeText(item);
+          onEmailCopied?.(item);
+        } catch (err) {
+          console.error("Failed to copy email:", err);
+        }
+      }, 300);
+    };
+
     return (
-      <a key={`${item}`} href={`mailto:${item}`} className="meta-link">
+      <button
+        key={`${item}`}
+        onClick={handleEmailClick}
+        className="meta-link"
+        type="button"
+        title={`Email: ${item}`}
+      >
         {item}
-      </a>
+      </button>
     );
   }
 
@@ -49,9 +72,17 @@ function renderProfileHighlight(item: string) {
   if (phoneRegex.test(item)) {
     const phoneDigits = item.replace(/\D/g, "");
     return (
-      <a key={`${item}`} href={`tel:+${phoneDigits}`} className="meta-link">
+      <button
+        key={`${item}`}
+        onClick={() => {
+          window.location.href = `tel:+${phoneDigits}`;
+        }}
+        className="meta-link"
+        type="button"
+        title={`Call: ${item}`}
+      >
         {item}
-      </a>
+      </button>
     );
   }
 
@@ -83,7 +114,13 @@ export function ProfileHeader({
   roleLabel,
   profileHighlights,
 }: ProfileHeaderProps) {
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
   const githubBadgeUrl = getGitHubBadgeUrl(siteContent.githubLink);
+
+  const handleEmailCopied = (email: string) => {
+    setCopiedEmail(email);
+    setTimeout(() => setCopiedEmail(null), 2000);
+  };
 
   return (
     <section className="profile-panel" aria-label="Profile">
@@ -117,7 +154,14 @@ export function ProfileHeader({
         ) : null}
         {profileHighlights.length > 0 ? (
           <div className="meta-row">
-            {profileHighlights.map((item) => renderProfileHighlight(item))}
+            {profileHighlights.map((item) =>
+              renderProfileHighlight(item, handleEmailCopied)
+            )}
+            {copiedEmail && (
+              <div className="copy-notification">
+                Copied: {copiedEmail}
+              </div>
+            )}
           </div>
         ) : null}
       </div>
