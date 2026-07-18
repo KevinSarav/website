@@ -84,7 +84,7 @@ export function ProfileHeader({
   profileHighlights,
 }: ProfileHeaderProps) {
   const githubBadgeUrl = getGitHubBadgeUrl(siteContent.githubLink);
-  
+
   return (
     <section className="profile-panel" aria-label="Profile">
       <div className="profile-copy">
@@ -98,11 +98,7 @@ export function ProfileHeader({
               className="github-badge"
               aria-label="View on GitHub"
             >
-              <img
-                src={githubBadgeUrl}
-                alt="GitHub badge"
-                height="28"
-              />
+              <img src={githubBadgeUrl} alt="GitHub badge" height="28" />
             </a>
           ) : null}
         </div>
