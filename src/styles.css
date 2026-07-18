@@ -65,6 +65,14 @@ body {
 .profile-copy {
   display: grid;
   align-content: start;
+  position: relative;
+}
+
+.profile-header-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  justify-content: space-between;
 }
 
 .profile-name {
@@ -72,6 +80,29 @@ body {
   font-size: var(--size-title);
   line-height: 0.9;
   letter-spacing: -0.05em;
+  flex: 1;
+}
+
+.github-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  margin-top: 0.25rem;
+}
+
+.github-badge:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.github-badge img {
+  display: block;
+  height: 28px;
+  width: auto;
+  border: none;
 }
 
 .profile-role-label {

@@ -20,6 +20,13 @@ function getDisplayText(item: string): string {
   return text;
 }
 
+function getGitHubBadgeUrl(githubLink: string): string {
+  // Create a simple GitHub badge with just the label
+  // Shields.io static badge format: /badge/<LABEL>-<MESSAGE>-<COLOR>
+  // Using underscores to avoid dash parsing issues
+  return `https://img.shields.io/badge/GitHub-Open_Repo-181717?logo=github&logoColor=white&style=flat`;
+}
+
 function renderProfileHighlight(item: string) {
   // Phone number pattern - flexible to match various formats like 832-220-8363, (832) 220-8363, +1 832 220 8363, etc.
   const phoneRegex = /^[\d\s\-()+.]{7,}$|^\d{3}[-.\s]?\d{3}[-.\s]?\d{4}$/;
@@ -76,10 +83,29 @@ export function ProfileHeader({
   roleLabel,
   profileHighlights,
 }: ProfileHeaderProps) {
+  const githubBadgeUrl = getGitHubBadgeUrl(siteContent.githubLink);
+  
   return (
     <section className="profile-panel" aria-label="Profile">
       <div className="profile-copy">
-        <h1 className="profile-name">{siteContent.name}</h1>
+        <div className="profile-header-container">
+          <h1 className="profile-name">{siteContent.name}</h1>
+          {githubBadgeUrl && siteContent.githubLink ? (
+            <a
+              href={siteContent.githubLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="github-badge"
+              aria-label="View on GitHub"
+            >
+              <img
+                src={githubBadgeUrl}
+                alt="GitHub badge"
+                height="28"
+              />
+            </a>
+          ) : null}
+        </div>
         {isProfileDocLoading ? (
           <p className="profile-role-label profile-role-label-loading">
             Loading role...

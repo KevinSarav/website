@@ -6,6 +6,7 @@ export const siteContent = {
   profileDocId: runtimeConfig.gdocProfileId,
   summaryDocId: runtimeConfig.gdocSummaryId,
   location: runtimeConfig.location,
+  githubLink: runtimeConfig.githubLink,
   highlightsDocId: runtimeConfig.gdocHighlightsId,
   resume: {
     openUrl:

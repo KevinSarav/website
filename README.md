@@ -19,6 +19,7 @@ Configuration in `.env` (committed to repo):
 
 - `SITE_APP_NAME`, `PROFILE_MY_NAME` — profile metadata
 - `PROFILE_CITY`, `PROFILE_REGION`, `PROFILE_COUNTRY` — location metadata shown as `City, Region, Country`
+- `SITE_GITHUB_LINK` — GitHub repository URL (format: `https://github.com/{owner}/{repo}`); displays a badge next to your name
 - `SITE_GDOC_PROFILE_ID` — Google Doc ID used for the profile section (role and contact bubbles)
 - `SITE_GDOC_SUMMARY_ID` — Google Doc ID used for the profile summary text
 - `SITE_GDOC_HIGHLIGHTS_ID` — Google Doc ID used for highlights (one line per highlight)
