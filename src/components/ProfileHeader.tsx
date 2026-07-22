@@ -28,7 +28,10 @@ function getGitHubBadgeUrl(githubLink: string): string {
   return `https://img.shields.io/badge/GitHub-Open_Repo-181717?logo=github&logoColor=white&style=flat`;
 }
 
-function renderProfileHighlight(item: string, onEmailCopied?: (email: string) => void) {
+function renderProfileHighlight(
+  item: string,
+  onEmailCopied?: (email: string) => void,
+) {
   // Phone number pattern - flexible to match various formats like 832-220-8363, (832) 220-8363, +1 832 220 8363, etc.
   const phoneRegex = /^[\d\s\-()+.]{7,}$|^\d{3}[-.\s]?\d{3}[-.\s]?\d{4}$/;
   // Email pattern
@@ -42,7 +45,7 @@ function renderProfileHighlight(item: string, onEmailCopied?: (email: string) =>
     const handleEmailClick = async () => {
       // First, try to open the email client
       window.location.href = `mailto:${item}`;
-      
+
       // After a short delay, if the page is still focused (mailto didn't open an app),
       // fall back to copying to clipboard
       setTimeout(async () => {
@@ -127,6 +130,15 @@ export function ProfileHeader({
       <div className="profile-copy">
         <div className="profile-header-container">
           <h1 className="profile-name">{siteContent.name}</h1>
+          {siteContent.mastodonVerifiedLink ? (
+            <a
+              href={siteContent.mastodonVerifiedLink}
+              rel="me"
+              className="visually-hidden"
+            >
+              Mastodon
+            </a>
+          ) : null}
           {githubBadgeUrl && siteContent.githubLink ? (
             <a
               href={siteContent.githubLink}
@@ -155,12 +167,10 @@ export function ProfileHeader({
         {profileHighlights.length > 0 ? (
           <div className="meta-row">
             {profileHighlights.map((item) =>
-              renderProfileHighlight(item, handleEmailCopied)
+              renderProfileHighlight(item, handleEmailCopied),
             )}
             {copiedEmail && (
-              <div className="copy-notification">
-                Copied: {copiedEmail}
-              </div>
+              <div className="copy-notification">Copied: {copiedEmail}</div>
             )}
           </div>
         ) : null}
