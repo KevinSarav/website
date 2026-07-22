@@ -7,7 +7,6 @@ export const siteContent = {
   summaryDocId: runtimeConfig.gdocSummaryId,
   location: runtimeConfig.location,
   githubLink: runtimeConfig.githubLink,
-  mastodonVerifiedLink: runtimeConfig.mastodonVerifiedLink,
   highlightsDocId: runtimeConfig.gdocHighlightsId,
   resume: {
     openUrl:

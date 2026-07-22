@@ -4,7 +4,6 @@ export type RuntimeConfig = {
   location: string;
   publicUrl: string;
   githubLink: string;
-  mastodonVerifiedLink: string;
   gdocProfileId: string;
   gdocSummaryId: string;
   gdocHighlightsId: string;
@@ -37,7 +36,6 @@ export const runtimeConfig: RuntimeConfig = {
   location: getString(window.__APP_CONFIG__?.location),
   publicUrl: getString(window.__APP_CONFIG__?.publicUrl),
   githubLink: getString(window.__APP_CONFIG__?.githubLink),
-  mastodonVerifiedLink: getString(window.__APP_CONFIG__?.mastodonVerifiedLink),
   gdocProfileId: getString(window.__APP_CONFIG__?.gdocProfileId),
   gdocSummaryId: getString(window.__APP_CONFIG__?.gdocSummaryId),
   gdocHighlightsId: getString(window.__APP_CONFIG__?.gdocHighlightsId),

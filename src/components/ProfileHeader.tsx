@@ -130,15 +130,6 @@ export function ProfileHeader({
       <div className="profile-copy">
         <div className="profile-header-container">
           <h1 className="profile-name">{siteContent.name}</h1>
-          {siteContent.mastodonVerifiedLink ? (
-            <a
-              href={siteContent.mastodonVerifiedLink}
-              rel="me"
-              className="visually-hidden"
-            >
-              Mastodon
-            </a>
-          ) : null}
           {githubBadgeUrl && siteContent.githubLink ? (
             <a
               href={siteContent.githubLink}

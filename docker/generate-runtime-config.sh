@@ -12,7 +12,6 @@ profile_region="${PROFILE_REGION:-}"
 profile_country="${PROFILE_COUNTRY:-}"
 public_url="${SITE_PUBLIC_URL:-}"
 github_link="${SITE_GITHUB_LINK:-}"
-mastodon_verified_link="${MASTODON_VERIFIED_LINK:-}"
 gdoc_resume_id="${SITE_GDOC_RESUME_ID:-}"
 gdoc_profile_id="${SITE_GDOC_PROFILE_ID:-}"
 gdoc_summary_id="${SITE_GDOC_SUMMARY_ID:-}"
@@ -68,7 +67,6 @@ window.__APP_CONFIG__ = {
   location: "$(escape_js "$location")",
   publicUrl: "$(escape_js "$public_url")",
   githubLink: "$(escape_js "$github_link")",
-  mastodonVerifiedLink: "$(escape_js "$mastodon_verified_link")",
   gdocProfileId: "$(escape_js "$gdoc_profile_id")",
   gdocSummaryId: "$(escape_js "$gdoc_summary_id")",
   gdocHighlightsId: "$(escape_js "$gdoc_highlights_id")",
